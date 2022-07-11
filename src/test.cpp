@@ -8,14 +8,27 @@ struct Point {
   int y;
 };
 
-template<typename S, typename K, typename E>
-auto serialize(Point& point, serde::Serializer<S, K, E>& ser) -> typename S::Result
+void serialize(serde::Serializer& ser, Point& point)
 {
-  if (auto ret = ser.serialize_int(point.x); ret.isErr())
-    return ret;
-  return ser.serialize_int(point.y);
+  ser.serialize_seq_beg();
+    ser.serialize_seq_beg();
+      ser.serialize_int(point.x);
+      ser.serialize_int(point.y);
+    ser.serialize_seq_end();
+    ser.serialize_seq_beg();
+      ser.serialize_seq_beg();
+        ser.serialize_int(point.x);
+        ser.serialize_int(point.y);
+      ser.serialize_seq_end();
+      ser.serialize_seq_beg();
+        ser.serialize_int(point.x);
+        ser.serialize_int(point.y);
+      ser.serialize_seq_end();
+    ser.serialize_seq_end();
+  ser.serialize_seq_end();
 }
-}
+
+} // namespace point
 
 int main()
 {
