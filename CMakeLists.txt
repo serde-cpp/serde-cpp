@@ -28,6 +28,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -Wall")
 add_executable(serde_test)
 target_sources(serde_test PRIVATE
   src/test.cpp
+  src/impl.cpp
 )
 target_include_directories(serde_test PRIVATE
   ${CMAKE_SOURCE_DIR}/include

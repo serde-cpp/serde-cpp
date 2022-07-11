@@ -8,26 +8,6 @@ struct Point {
   int y;
 };
 
-void serialize(serde::Serializer& ser, Point& point)
-{
-  ser.serialize_seq_beg();
-    ser.serialize_seq_beg();
-      ser.serialize_int(point.x);
-      ser.serialize_int(point.y);
-    ser.serialize_seq_end();
-    ser.serialize_seq_beg();
-      ser.serialize_seq_beg();
-        ser.serialize_int(point.x);
-        ser.serialize_int(point.y);
-      ser.serialize_seq_end();
-      ser.serialize_seq_beg();
-        ser.serialize_int(point.x);
-        ser.serialize_int(point.y);
-      ser.serialize_seq_end();
-    ser.serialize_seq_end();
-  ser.serialize_seq_end();
-}
-
 } // namespace point
 
 int main()
