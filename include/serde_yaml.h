@@ -18,27 +18,31 @@ struct Error final {
   std::string text;
 };
 
-struct Token {
-  enum class Kind {
-    Seq,
-    Map,
-    Entry,
+class YamlSerializer : public serde::Serializer {
+
+  struct Token {
+    enum class Kind {
+      Seq,
+      Map,
+      Entry,
+    };
+    Kind kind;
+    size_t count = 0;
   };
-  Kind kind;
-  size_t count = 0;
-};
-
-
-struct YamlSerializer : public serde::Serializer {
 
   void handle_prefix() {
-    if (!seq.empty()) {
-      Token& token = seq.top();
+    if (!stack.empty()) {
+      Token& token = stack.top();
       if (token.kind == Token::Kind::Seq || token.kind == Token::Kind::Map) {
         if (++token.count > 1)
           ss << ", ";
       }
     }
+  }
+
+  void serialize_bool(bool v) final {
+    handle_prefix();
+    ss << std::boolalpha << v << std::noboolalpha;
   }
 
   void serialize_int(int v) final {
@@ -51,50 +55,75 @@ struct YamlSerializer : public serde::Serializer {
     ss << v;
   }
 
-  void serialize_seq_beg() final {
+  void serialize_none() final {
+    handle_prefix();
+    ss << "null";
+  }
+
+  void serialize_seq_begin() final {
     handle_prefix();
     ss << '[';
-    seq.push({Token::Kind::Seq});
+    stack.push({Token::Kind::Seq});
   }
 
   void serialize_seq_end() final {
     ss << ']';
-    seq.pop();
+    stack.pop();
   }
 
-  void serialize_map_beg() final {
+  void serialize_map_begin() final {
     handle_prefix();
     ss << '{';
-    seq.push({Token::Kind::Map});
+    stack.push({Token::Kind::Map});
   }
   void serialize_map_end() final {
     ss << '}';
-    seq.pop();
+    stack.pop();
   }
 
-  void serialize_map_key_beg() final {
+  void serialize_map_key_begin() final {
     handle_prefix();
-    seq.push({Token::Kind::Entry});
+    stack.push({Token::Kind::Entry});
   }
   void serialize_map_key_end() final {
     ss << ": ";
   }
 
-  void serialize_map_value_beg() final {
+  void serialize_map_value_begin() final {
   }
   void serialize_map_value_end() final {
-    seq.pop();
+    stack.pop();
   }
 
+  void serialize_struct_begin() final {
+    handle_prefix();
+    ss << '{';
+    stack.push({Token::Kind::Map});
+  }
+  void serialize_struct_end() final {
+    ss << '}';
+    stack.pop();
+  }
+
+  void serialize_struct_field_begin(const char* name) final {
+    handle_prefix();
+    stack.push({Token::Kind::Entry});
+    ss << name << ": ";
+  }
+  void serialize_struct_field_end() final {
+    stack.pop();
+  }
+
+public:
 
   YamlSerializer() = default;
   virtual ~YamlSerializer() = default;
 
   std::string str() { return ss.str(); }
 
- private:
+private:
   std::stringstream ss;
-  std::stack<Token> seq;
+  std::stack<Token> stack;
 };
 
 template<typename T>
@@ -107,7 +136,7 @@ template<typename T>
 auto to_string(T&& obj) -> Result<std::string, Error>
 {
   auto ser = YamlSerializer();
-  serde::serialize(ser, obj);
+  ser.serialize(obj);
   return Ok(ser.str());
 }
 
