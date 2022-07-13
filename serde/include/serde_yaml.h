@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <stack>
 #include "serde.h"
+#include <assert.h>
 
 namespace serde_yaml {
 
@@ -33,13 +34,14 @@ class YamlSerializer : public serde::Serializer {
     size_t count = 0;
   };
 
-  void handle_prefix(bool complex = false) {
+  void handle_prefix(bool complex = false, serde::Style style = serde::Style::Inline) {
     if (!stack.empty()) {
       Token& token = stack.top();
 
       switch (token.kind) {
         case Token::Kind::Seq: {
           if (token.style == serde::Style::Inline) {
+            assert(!(complex && style == serde::Style::Fold));
             if (++token.count > 1)
               ss << ", ";
           } else if (token.style == serde::Style::Fold) {
@@ -52,6 +54,7 @@ class YamlSerializer : public serde::Serializer {
 
         case Token::Kind::Map: {
           if (token.style == serde::Style::Inline) {
+            assert(!(complex && style == serde::Style::Fold));
             if (++token.count > 1)
               ss << ", ";
           } else if (token.style == serde::Style::Fold) {
@@ -103,7 +106,7 @@ class YamlSerializer : public serde::Serializer {
   }
 
   void serialize_seq_begin(serde::Style style = serde::Style::Fold) final {
-    handle_prefix(true);
+    handle_prefix(true, style);
     if (style == serde::Style::Inline)
       ss << '[';
     stack_push(Token::Kind::Seq, style);
@@ -116,12 +119,14 @@ class YamlSerializer : public serde::Serializer {
         return;
       if (top.style == serde::Style::Inline)
         ss << ']';
+      else if (top.style == serde::Style::Fold && stack.size() == 1)
+        ss << '\n';
       stack.pop();
     }
   }
 
   void serialize_map_begin(serde::Style style = serde::Style::Fold) final {
-    handle_prefix(true);
+    handle_prefix(true, style);
     if (style == serde::Style::Inline)
       ss << '{';
     stack_push(Token::Kind::Map, style);
@@ -134,6 +139,8 @@ class YamlSerializer : public serde::Serializer {
         return;
       if (top.style == serde::Style::Inline)
         ss << '}';
+      else if (top.style == serde::Style::Fold && stack.size() == 1)
+        ss << '\n';
       stack.pop();
     }
   }
@@ -175,7 +182,9 @@ class YamlSerializer : public serde::Serializer {
 
 public:
 
-  YamlSerializer() = default;
+  YamlSerializer() {
+    ss << "---\n";
+  }
   virtual ~YamlSerializer() = default;
 
   std::string str() { return ss.str(); }
