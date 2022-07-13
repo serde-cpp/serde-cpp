@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
-project(serde LANGUAGES CXX)
+project(serde-cpp)
+
+# This is a Super-Project which builds Sub-Projects and manage library dependencies.
+# Libraries are built first as external projects and installed at the build directory.
+# Sub-Projects are built after and can relate to the pre-built external libraries in the
+# build directory with find_package or find_library.
 
 #########################################################################################
 # Configuration
@@ -10,29 +15,29 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type default to Debug" FORCE)
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# Turn on when having trouble building
-set(CMAKE_VERBOSE_MAKEFILE OFF)
-# Compilation Database for C++ language servers
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Default compilation settings
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -pg -fsanitize=undefined -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -Wall")
+#########################################################################################
+# Dependencies
+#########################################################################################
+# Module ExternaProject for building projects in external trees.
+include(ExternalProject)
+# Include the external libraries in the path where cmake looks for find_package/library.
+list(PREPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/external")
+# `external` directory contains all dependency libraries for the sub-projects.
+add_subdirectory(external)
 
 #########################################################################################
 # Project
 #########################################################################################
-add_executable(serde_test)
-target_sources(serde_test PRIVATE
-  src/test.cpp
-  src/impl.cpp
-)
-target_include_directories(serde_test PRIVATE
-  ${CMAKE_SOURCE_DIR}/include
-)
-#target_link_libraries(serde PRIVATE)
-#target_compile_definitions(spaceship PRIVATE)
-#install(TARGETS spaceship)
+message(STATUS "Adding sub-project: serde")
+ExternalProject_Add(serde
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/serde
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/serde
+    BUILD_ALWAYS 1
+    CMAKE_ARGS
+        -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+        -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    DEPENDS
+        googletest_external)
