@@ -79,6 +79,15 @@ void serde::serialize(serde::Serializer& ser, const types::Point& point)
                                      types::Numbers::Three};
   ser.serialize(vec);
 
+  ser.serialize_struct_begin();
+    ser.serialize_struct_field_begin("w");
+      ser.serialize_map_begin();
+        ser.serialize_map_entry("a", point.x);
+        ser.serialize_map_entry("b", point.y);
+      ser.serialize_map_end();
+    ser.serialize_struct_field_end();
+  ser.serialize_struct_end();
+
   ser.serialize_seq_end();
 }
 

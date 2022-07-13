@@ -2,6 +2,7 @@
 
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include <stack>
 #include "serde.h"
 
@@ -27,17 +28,58 @@ class YamlSerializer : public serde::Serializer {
       Entry,
     };
     Kind kind;
+    serde::Style style;
+    size_t indent = 0;
     size_t count = 0;
   };
 
-  void handle_prefix() {
+  void handle_prefix(bool complex = false) {
     if (!stack.empty()) {
       Token& token = stack.top();
-      if (token.kind == Token::Kind::Seq || token.kind == Token::Kind::Map) {
-        if (++token.count > 1)
-          ss << ", ";
+
+      switch (token.kind) {
+        case Token::Kind::Seq: {
+          if (token.style == serde::Style::Inline) {
+            if (++token.count > 1)
+              ss << ", ";
+          } else if (token.style == serde::Style::Fold) {
+            if (++token.count > 1)
+              ss << '\n' << std::setw(token.indent + 2);
+            ss << "- ";
+          }
+          break;
+        }
+
+        case Token::Kind::Map: {
+          if (token.style == serde::Style::Inline) {
+            if (++token.count > 1)
+              ss << ", ";
+          } else if (token.style == serde::Style::Fold) {
+            if (++token.count > 1)
+              ss << '\n' << std::setw(token.indent) << "";
+          }
+          break;
+        }
+
+        case Token::Kind::Entry: {
+          if (token.style == serde::Style::Fold) {
+            if (++token.count > 1 && complex)
+              ss << '\n' << std::setw(token.indent) << "";
+          }
+        }
       }
     }
+  }
+
+  void stack_push(Token::Kind kind, serde::Style style) {
+    size_t indent = 0;
+    if (!stack.empty()) {
+      auto& top = stack.top();
+      indent = top.indent;
+      if (top.kind != Token::Kind::Entry)
+        indent += 2;
+    }
+    stack.push({kind, style, indent, 0});
   }
 
   void serialize_bool(bool v) final {
@@ -60,30 +102,50 @@ class YamlSerializer : public serde::Serializer {
     ss << "null";
   }
 
-  void serialize_seq_begin() final {
-    handle_prefix();
-    ss << '[';
-    stack.push({Token::Kind::Seq});
+  void serialize_seq_begin(serde::Style style = serde::Style::Fold) final {
+    handle_prefix(true);
+    if (style == serde::Style::Inline)
+      ss << '[';
+    stack_push(Token::Kind::Seq, style);
   }
 
   void serialize_seq_end() final {
-    ss << ']';
-    stack.pop();
+    if (!stack.empty()) {
+      auto& top = stack.top();
+      if (top.kind != Token::Kind::Seq)
+        return;
+      if (top.style == serde::Style::Inline)
+        ss << ']';
+      stack.pop();
+    }
   }
 
-  void serialize_map_begin() final {
-    handle_prefix();
-    ss << '{';
-    stack.push({Token::Kind::Map});
+  void serialize_map_begin(serde::Style style = serde::Style::Fold) final {
+    handle_prefix(true);
+    if (style == serde::Style::Inline)
+      ss << '{';
+    stack_push(Token::Kind::Map, style);
   }
+
   void serialize_map_end() final {
-    ss << '}';
-    stack.pop();
+    if (!stack.empty()) {
+      auto& top = stack.top();
+      if (top.kind != Token::Kind::Map)
+        return;
+      if (top.style == serde::Style::Inline)
+        ss << '}';
+      stack.pop();
+    }
   }
 
   void serialize_map_key_begin() final {
-    handle_prefix();
-    stack.push({Token::Kind::Entry});
+    if (!stack.empty()) {
+      auto& top = stack.top();
+      if (top.kind != Token::Kind::Map)
+        return;
+      handle_prefix();
+      stack_push(Token::Kind::Entry, top.style);
+    }
   }
   void serialize_map_key_end() final {
     ss << ": ";
@@ -95,20 +157,17 @@ class YamlSerializer : public serde::Serializer {
     stack.pop();
   }
 
-  void serialize_struct_begin() final {
-    handle_prefix();
-    ss << '{';
-    stack.push({Token::Kind::Map});
+  void serialize_struct_begin(serde::Style style = serde::Style::Fold) final {
+    serialize_map_begin(style);
   }
   void serialize_struct_end() final {
-    ss << '}';
-    stack.pop();
+    serialize_map_end();
   }
 
   void serialize_struct_field_begin(const char* name) final {
-    handle_prefix();
-    stack.push({Token::Kind::Entry});
-    ss << name << ": ";
+    serialize_map_key_begin();
+    serialize(name);
+    serialize_map_key_end();
   }
   void serialize_struct_field_end() final {
     stack.pop();

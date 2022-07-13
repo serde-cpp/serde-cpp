@@ -13,6 +13,11 @@ void serialize(class Serializer& ser, const T& v);
 template<template<typename...> typename T, typename... U>
 void serialize(class Serializer& ser, const T<U...>& v);
 
+enum class Style {
+  Inline,
+  Fold,
+};
+
 class Serializer {
 public:
   template<typename T> void serialize(T&& v) {
@@ -37,11 +42,11 @@ public:
   virtual void serialize_none() = 0;
 
   // Sequence
-  virtual void serialize_seq_begin() = 0;
+  virtual void serialize_seq_begin(Style style = Style::Fold) = 0;
   virtual void serialize_seq_end() = 0;
 
   // Map
-  virtual void serialize_map_begin() = 0;
+  virtual void serialize_map_begin(Style style = Style::Fold) = 0;
   virtual void serialize_map_end() = 0;
 
   virtual void serialize_map_key_begin() = 0;
@@ -69,7 +74,7 @@ public:
   }
 
   // Struct
-  virtual void serialize_struct_begin() = 0;
+  virtual void serialize_struct_begin(Style style = Style::Fold) = 0;
   virtual void serialize_struct_end() = 0;
 
   virtual void serialize_struct_field_begin(const char* name) = 0;
