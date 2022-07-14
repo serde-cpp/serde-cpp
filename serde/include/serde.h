@@ -111,5 +111,33 @@ inline void serialize(Serializer& ser, T<U...> const& vec)
   ser.serialize_seq_end();
 }
 
+// ==================================================================
+
+struct Error final {
+  enum class Kind {
+    Invalid,
+  };
+
+  Kind kind;
+  size_t line = 0;
+  size_t column = 0;
+  std::string text = "";
+};
+
+template<typename T>
+Error deserialize(class Deserializer& ser, const T& v);
+
+class Deserializer {
+public:
+  using Result = ::Result<void, Error>;
+  template<typename T> Result deserialize(std::decay_t<T>& v) {
+    serde::deserialize(*this, v);
+  }
+
+  //virtual Result deserialize_bool(bool& v) = 0;
+  //virtual Result deserialize_int(int& v) = 0;
+  //virtual Result deserialize_cstr(char*& v, size_t n) = 0;
+};
+
 } // namespace serde
 

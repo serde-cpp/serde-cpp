@@ -4,23 +4,14 @@
 #include <sstream>
 #include <iomanip>
 #include <stack>
+#include <list>
 #include "serde.h"
 #include <assert.h>
+#include <cstring>
 
 namespace serde_yaml {
 
-struct Error final {
-  enum class Kind {
-    Invalid,
-  };
-
-  Error(Kind kind, std::string&& text) : kind(kind), text(std::move(text)) {};
-
-  Kind kind;
-  std::string text;
-};
-
-class YamlSerializer : public serde::Serializer {
+class YamlSerializer final : public serde::Serializer {
 
   struct Token {
     enum class Kind {
@@ -185,7 +176,7 @@ public:
   YamlSerializer() {
     ss << "---\n";
   }
-  virtual ~YamlSerializer() = default;
+  ~YamlSerializer() = default;
 
   std::string str() { return ss.str(); }
 
@@ -195,17 +186,135 @@ private:
 };
 
 template<typename T>
-auto from_str(std::string_view str) -> Result<T, Error>
-{
-  return Ok(T());
-}
-
-template<typename T>
-auto to_string(T&& obj) -> Result<std::string, Error>
+auto to_string(T&& obj) -> Result<std::string, serde::Error>
 {
   auto ser = YamlSerializer();
   ser.serialize(obj);
   return Ok(ser.str());
+}
+
+// ==================================================================
+
+class YamlDeserializer final : public serde::Deserializer {
+
+  struct Token {
+    enum class Kind {
+      Seq,
+      Map,
+      Entry,
+      Scalar,
+    };
+    Kind kind;
+    std::string_view value;
+  };
+
+public:
+  YamlDeserializer(std::string&& yaml)
+    : yaml(std::move(yaml)), ss(this->yaml)
+  {
+    ss.exceptions(std::ios_base::goodbit);
+  }
+  ~YamlDeserializer() = default;
+
+  Result parse() {
+    for (char ch = ss.peek(); ss.good(); ch = ss.peek()) {
+      std::cout << "  " << int(ch) << "(" << ch << ")"
+                << " pos: " << ss.tellg() << std::endl;
+      bool got = false;
+      switch (ch) {
+        case 'a'...'z': [[fallthrough]];
+        case 'A'...'B': got = parse_str(); break; // scalar str
+        case '0'...'9': got = parse_num(); break; // scalar number
+        case '-':  got = parse_hyphen(); break; // doc or sequence
+        case ':': break; // key
+        case ',': break; // entry end
+        case '\n': break; // key/value end
+        case ' ': break; // space or str
+        default: break;
+      }
+      if (!got) ss.get();
+    }
+    return Ok();
+  }
+
+  bool parse_num() {
+    int count = 0;
+    for(char ch = ss.peek(); ss.good() || ss.eof(); ss.get(), ch = ss.peek()) {
+      switch (ch) {
+        case '0'...'9': count++; break;
+        default: goto exit;
+      }
+    }
+exit:
+    ss.get();
+    std::cout << ">> got num" << std::endl;
+    return true;
+  }
+
+  bool parse_str() {
+    int count = 0;
+    for(char ch = ss.peek(); ss.good() || ss.eof(); ss.get(), ch = ss.peek()) {
+      switch (ch) {
+        case 'a'...'z': [[fallthrough]];
+        case 'A'...'B': count++; break;
+        default: goto exit;
+      }
+    }
+exit:
+    ss.get();
+    std::cout << ">> got str" << std::endl;
+    return true;
+  }
+
+  bool parse_hyphen() {
+    if (parse_doc_header()) return true;
+    if (parse_seq()) return true;
+    return false;
+  }
+
+  bool parse_doc_header() {
+    auto g = ss.tellg();
+    char str[5] = {0};
+    ss.get(str, sizeof(str), '\0');
+    if (ss.good() || ss.eof()) {
+      if (!std::memcmp(str, "---\n", 4)) {
+        std::cout << ">> got doc" << std::endl;
+        return true;
+      }
+    } else std::cout << "~~ no good" << std::endl;
+    std::cout << "!! no doc" << std::endl;
+    ss.seekg(g);
+    return false;
+  }
+
+  bool parse_seq() {
+    auto g = ss.tellg();
+    char str[3] = {0};
+    ss.get(str, sizeof(str), '\0');
+    if (ss.good() || ss.eof()) {
+      if (str[0] == '-' && (str[1] == ' ' || str[1] == '\n')) {
+        std::cout << ">> got seq" << std::endl;
+        return true;
+      }
+    } else std::cout << "~~ no good" << std::endl;
+    std::cout << "!! no seq" << std::endl;
+    ss.seekg(g);
+    return false;
+  }
+
+private:
+  std::string yaml;
+  std::istringstream ss;
+  std::list<Token> tokens;
+};
+
+template<typename T>
+auto from_str(std::string str) -> Result<T, serde::Error>
+{
+  auto de = YamlDeserializer(std::move(str));
+  de.parse();
+  //de.deserialize();
+  return Ok(T());
 }
 
 } // namespace serde_yaml

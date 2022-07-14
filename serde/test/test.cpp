@@ -14,8 +14,7 @@ struct Point {
 
 TEST(Main, Test)
 {
-  types::Point point = serde_yaml::from_str<types::Point>("{x: 1, y: 2}").unwrap();
-
+  types::Point point;
   point.x = 10; point.y = 20;
   std::string str = serde_yaml::to_string(point).unwrap();
   std::cout << str << std::endl;
@@ -47,4 +46,6 @@ TEST(Main, Test)
 
 TEST(Main, Test2)
 {
+  using types::Point;
+  Point point = serde_yaml::from_str<Point>("---\n- abc\n- b\n- 10\n").unwrap();
 }
