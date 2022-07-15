@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
-#include "serde.h"
-#include "serde_yaml_detail.h"
+#include <serde/error.h>
+#include <serde/result.h>
+#include <serde/serializer.h>
+#include "ser_detail.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serde YAML
@@ -14,7 +16,7 @@ template<typename T>
 auto to_string(T&& obj) -> Result<std::string, serde::Error>
 {
   auto ser = detail::SerializerNew();
-  ser->serialize(obj);
+  ser->serialize(std::forward<T>(obj));
   return detail::SerializerOutput(ser.get());
 }
 

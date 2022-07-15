@@ -34,8 +34,8 @@ find_package(ryml REQUIRED)
 # Library
 #########################################################################################
 add_library(serde STATIC)
-target_sources(serde PRIVATE src/serde_yaml.cpp)
-target_include_directories(serde PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_sources(serde PRIVATE src/serde_yaml/ser_yaml.cpp)
+target_include_directories(serde PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(serde PRIVATE ryml::ryml)
 install(TARGETS serde)
 
