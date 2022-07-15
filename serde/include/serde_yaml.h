@@ -1,15 +1,13 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include "serde.h"
+#include "serde_yaml_detail.h"
 
+///////////////////////////////////////////////////////////////////////////////
+// Serde YAML
+///////////////////////////////////////////////////////////////////////////////
 namespace serde_yaml {
-
-namespace detail {
-auto SerializerNew() -> std::unique_ptr<serde::Serializer>;
-auto SerializerOutput(serde::Serializer* ser) -> Result<std::string, serde::Error>;
-}
 
 /// YAML Serializer function from T to yaml string
 template<typename T>

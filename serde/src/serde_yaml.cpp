@@ -1,11 +1,13 @@
-#include <stack>
+#include "serde_yaml.h"
 
+#include <stack>
 #include <ryml_std.hpp>
 #include <ryml.hpp>
 #include <c4/format.hpp>
 
-#include "serde_yaml.h"
-
+///////////////////////////////////////////////////////////////////////////////
+// Serde YAML
+///////////////////////////////////////////////////////////////////////////////
 namespace serde_yaml {
 
 class YamlSerializer final : public serde::Serializer {
@@ -14,44 +16,19 @@ public:
     stack.push(tree.rootref());
   }
 
-  // Scalar
-  template<typename T>
-  void serialize_scalar(T&& val) {
-    auto curr = stack.top();
-    if (curr.is_seq())
-      curr.append_child() << val;
-    else if (curr.parent_is_map()) {
-      curr.is_seed();
-      if (!curr.has_key())
-        curr << ryml::key(val);
-      else if (!curr.has_val())
-        curr << val;
-      else {
-        curr.append_sibling() << ryml::key(val);
-        stack.push(curr.next_sibling());
-      }
-    }
-    else {
-      curr << val;
-    }
-  }
+  /////////////////////////////////////////////////////////////////////////////
+  // Serializer interface
+  /////////////////////////////////////////////////////////////////////////////
 
-  void serialize_bool(bool v) final {
-    serialize_scalar(v);
-  }
-
-  void serialize_int(int v) final {
-    serialize_scalar(v);
-  }
-
-  void serialize_cstr(const char* v) final {
-    serialize_scalar(v);
-  }
+  // Scalar ///////////////////////////////////////////////////////////////////
+  void serialize_bool(bool v) final { serialize_scalar(v); }
+  void serialize_int(int v) final { serialize_scalar(v); }
+  void serialize_cstr(const char* v) final { serialize_scalar(v); }
 
   void serialize_none() final {
   }
 
-  // Sequence
+  // Sequence /////////////////////////////////////////////////////////////////
   void serialize_seq_begin(serde::Style style = serde::Style::Fold) final {
     auto curr = stack.top();
     if (curr.is_seq() || curr.is_map()) {
@@ -69,7 +46,7 @@ public:
       stack.pop();
   }
 
-  // Map
+  // Map //////////////////////////////////////////////////////////////////////
   void serialize_map_begin(serde::Style style = serde::Style::Fold) final {
     auto curr = stack.top();
     if (curr.is_seq() || curr.is_map()) {
@@ -103,7 +80,7 @@ public:
     stack.pop();
   }
 
-  // Struct
+  // Struct ///////////////////////////////////////////////////////////////////
   void serialize_struct_begin(serde::Style style = serde::Style::Fold) final {
     serialize_map_begin();
   }
@@ -119,6 +96,31 @@ public:
   }
   void serialize_struct_field_end() final {
     serialize_map_value_end();
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Serialization Utils
+  /////////////////////////////////////////////////////////////////////////////
+
+  template<typename T>
+  void serialize_scalar(T&& val) {
+    auto curr = stack.top();
+    if (curr.is_seq())
+      curr.append_child() << val;
+    else if (curr.parent_is_map()) {
+      curr.is_seed();
+      if (!curr.has_key())
+        curr << ryml::key(val);
+      else if (!curr.has_val())
+        curr << val;
+      else {
+        curr.append_sibling() << ryml::key(val);
+        stack.push(curr.next_sibling());
+      }
+    }
+    else {
+      curr << val;
+    }
   }
 
   std::string emit() const {
