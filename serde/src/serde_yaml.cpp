@@ -1,40 +1,38 @@
-#pragma once
-
-#include <c4/yml/tree.hpp>
 #include <stack>
 
 #include <ryml_std.hpp>
 #include <ryml.hpp>
 #include <c4/format.hpp>
 
-#include "serde.h"
+#include "serde_yaml.h"
 
-namespace serde_rapidyaml {
+namespace serde_yaml {
 
-class RapidYamlSerializer final : public serde::Serializer {
+class YamlSerializer final : public serde::Serializer {
 public:
-  RapidYamlSerializer() {
+  YamlSerializer() {
     stack.push(tree.rootref());
   }
 
   // Scalar
   template<typename T>
-  void serialize_scalar(T&& v) {
+  void serialize_scalar(T&& val) {
     auto curr = stack.top();
     if (curr.is_seq())
-      curr.append_child() << v;
+      curr.append_child() << val;
     else if (curr.parent_is_map()) {
+      curr.is_seed();
       if (!curr.has_key())
-        curr << ryml::key(v);
+        curr << ryml::key(val);
       else if (!curr.has_val())
-        curr << v;
+        curr << val;
       else {
-        curr.append_sibling() << ryml::key(v);
+        curr.append_sibling() << ryml::key(val);
         stack.push(curr.next_sibling());
       }
     }
     else {
-      curr << v;
+      curr << val;
     }
   }
 
@@ -82,6 +80,7 @@ public:
       curr |= ryml::MAP;
     }
   }
+
   void serialize_map_end() final {
     auto curr = stack.top();
     if (curr.is_map())
@@ -93,10 +92,13 @@ public:
     curr.append_child();
     stack.push(curr.last_child());
   }
+
   void serialize_map_key_end() final {
   }
+
   void serialize_map_value_begin() final {
   }
+
   void serialize_map_value_end() final {
     stack.pop();
   }
@@ -128,13 +130,22 @@ private:
   std::stack<ryml::NodeRef> stack;
 };
 
-template<typename T>
-auto to_string(T&& obj) -> Result<std::string, serde::Error>
+
+namespace detail {
+
+auto SerializerNew() -> std::unique_ptr<serde::Serializer>
 {
-  auto ser = RapidYamlSerializer();
-  ser.serialize(obj);
-  return Ok(ser.emit());
+  return std::make_unique<YamlSerializer>();
 }
 
-} // namespace serde_rapidyaml
+auto SerializerOutput(serde::Serializer* ser) -> Result<std::string, serde::Error>
+{
+  auto yamlser = static_cast<YamlSerializer*>(ser);
+  return Ok(yamlser->emit());
+}
+
+} // namespace detail
+
+} // namespace serde_yaml
+
 

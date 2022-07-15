@@ -31,7 +31,16 @@ find_package(GTest REQUIRED)
 find_package(ryml REQUIRED)
 
 #########################################################################################
-# Project
+# Library
+#########################################################################################
+add_library(serde STATIC)
+target_sources(serde PRIVATE src/serde_yaml.cpp)
+target_include_directories(serde PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(serde PRIVATE ryml::ryml)
+install(TARGETS serde)
+
+#########################################################################################
+# Tests
 #########################################################################################
 add_executable(serde_test)
 target_sources(serde_test PRIVATE
@@ -42,10 +51,10 @@ target_include_directories(serde_test PRIVATE
   ${CMAKE_SOURCE_DIR}/include
 )
 target_link_libraries(serde_test PRIVATE
+  serde
   ryml::ryml
   GTest::gmock_main
   GTest::gmock
   GTest::gtest
 )
-install(TARGETS serde_test)
 
