@@ -40,4 +40,5 @@ ExternalProject_Add(serde
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     DEPENDS
+        rapidyaml_external
         googletest_external)

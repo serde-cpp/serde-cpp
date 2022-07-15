@@ -2,6 +2,7 @@
 
 #include "serde.h"
 #include "serde_yaml.h"
+#include "serde_rapidyaml.h"
 
 namespace types {
 
@@ -48,4 +49,12 @@ TEST(Main, Test2)
 {
   using types::Point;
   Point point = serde_yaml::from_str<Point>("---\n- abc\n- b\n- 10\n").unwrap();
+}
+
+TEST(Main, RapidYaml)
+{
+  types::Point point;
+  point.x = 10; point.y = 20;
+  std::string str = serde_rapidyaml::to_string(point).unwrap();
+  std::cout << str << std::endl;
 }

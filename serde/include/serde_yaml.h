@@ -8,6 +8,11 @@
 #include "serde.h"
 #include <assert.h>
 #include <cstring>
+#include <variant>
+#include <vector>
+#include <map>
+#include <memory>
+#include <optional>
 
 namespace serde_yaml {
 
@@ -197,15 +202,23 @@ auto to_string(T&& obj) -> Result<std::string, serde::Error>
 
 class YamlDeserializer final : public serde::Deserializer {
 
-  struct Token {
-    enum class Kind {
-      Seq,
-      Map,
-      Entry,
-      Scalar,
-    };
-    Kind kind;
-    std::string_view value;
+  enum class Token {
+    SeqBegin,
+    SeqEnd,
+    MapBegin,
+    MapEnd,
+    Scalar,
+  };
+
+  struct Node;
+
+  using Seq = std::vector<std::shared_ptr<Node>>;
+  using Map = std::map<std::string, std::shared_ptr<Node>>;
+  using Scalar = std::string;
+  using Variant = std::variant<Seq, Map, Scalar>;
+
+  struct Node {
+    Variant value{};
   };
 
 public:
@@ -223,9 +236,9 @@ public:
       bool got = false;
       switch (ch) {
         case 'a'...'z': [[fallthrough]];
-        case 'A'...'B': got = parse_str(); break; // scalar str
-        case '0'...'9': got = parse_num(); break; // scalar number
-        case '-':  got = parse_hyphen(); break; // doc or sequence
+        case 'A'...'B': [[fallthrough]];
+        case '0'...'9': got = parse_scalar(); break;
+        case '-':  got = parse_hyphen(); break;
         case ':': break; // key
         case ',': break; // entry end
         case '\n': break; // key/value end
@@ -237,32 +250,21 @@ public:
     return Ok();
   }
 
-  bool parse_num() {
-    int count = 0;
-    for(char ch = ss.peek(); ss.good() || ss.eof(); ss.get(), ch = ss.peek()) {
-      switch (ch) {
-        case '0'...'9': count++; break;
-        default: goto exit;
-      }
-    }
-exit:
-    ss.get();
-    std::cout << ">> got num" << std::endl;
-    return true;
-  }
-
-  bool parse_str() {
+  bool parse_scalar() {
     int count = 0;
     for(char ch = ss.peek(); ss.good() || ss.eof(); ss.get(), ch = ss.peek()) {
       switch (ch) {
         case 'a'...'z': [[fallthrough]];
-        case 'A'...'B': count++; break;
+        case 'A'...'B': [[fallthrough]];
+        case '0'...'9': count++; break;
+        case ':': break; // key
+        case ',': break; // entry end
         default: goto exit;
       }
     }
 exit:
     ss.get();
-    std::cout << ">> got str" << std::endl;
+    std::cout << ">> got scalar" << std::endl;
     return true;
   }
 
@@ -302,10 +304,47 @@ exit:
     return false;
   }
 
+  void add_node(Token token, std::optional<Scalar> scalar) {
+    auto add = [&] (std::shared_ptr<Node> node) {
+      if (stack.empty()) return;
+      auto curr = stack.top();
+      if (auto seq = std::get_if<Seq>(&curr->value); seq) {
+        seq->push_back(node);
+      }
+      if (auto map = std::get_if<Map>(&curr->value); map) {
+        (*map)["key"] = node;
+      }
+    };
+
+    std::shared_ptr<Node> node;
+    switch (token) {
+      case Token::SeqBegin: {
+        node.reset(new Node{Seq{}});
+        add(node);
+        stack.push(node);
+        break;
+      }
+      case Token::SeqEnd: {
+        stack.pop();
+        break;
+      }
+      case Token::MapBegin: break;
+      case Token::MapEnd: break;
+      case Token::Scalar: {
+        node.reset(new Node{*scalar});
+        add(node);
+      }
+    }
+    if (stack.size() == 1) {
+      root = stack.top();
+    }
+  }
+
 private:
   std::string yaml;
   std::istringstream ss;
-  std::list<Token> tokens;
+  std::shared_ptr<Node> root;
+  std::stack<std::shared_ptr<Node>> stack;
 };
 
 template<typename T>

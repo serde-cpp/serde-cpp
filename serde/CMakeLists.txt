@@ -27,6 +27,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -Wall")
 #########################################################################################
 # GoogleTest for unit testing
 find_package(GTest REQUIRED)
+# RapidYaml for parsing and emitting YAML
+find_package(ryml REQUIRED)
 
 #########################################################################################
 # Project
@@ -40,6 +42,7 @@ target_include_directories(serde_test PRIVATE
   ${CMAKE_SOURCE_DIR}/include
 )
 target_link_libraries(serde_test PRIVATE
+  ryml::ryml
   GTest::gmock_main
   GTest::gmock
   GTest::gtest
