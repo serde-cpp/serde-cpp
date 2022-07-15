@@ -28,16 +28,17 @@ public:
   void serialize_llint(long long int v) final { serialize_scalar(v); }
   void serialize_luint(unsigned long int v) final { serialize_scalar(v); }
   void serialize_lluint(unsigned long long int v) final { serialize_scalar(v); }
-  void serialize_float(int v) final { serialize_scalar(v); }
-  void serialize_double(int v) final { serialize_scalar(v); }
+  void serialize_float(float v) final { serialize_scalar(v); }
+  void serialize_double(double v) final { serialize_scalar(v); }
   void serialize_char(char v) final { serialize_scalar(v); }
+  void serialize_uchar(unsigned char v) final { serialize_scalar(v); }
   void serialize_cstr(const char* v) final { serialize_scalar(v); }
   void serialize_bytes(unsigned char* v, size_t len) final {
   }
 
   // Optional //////////////////////////////////////////////////////////////////
-  void serialize_none() final {
-  }
+  void serialize_some_next() final { }
+  void serialize_none() final { }
 
   // Sequence //////////////////////////////////////////////////////////////////
   void serialize_seq_begin() final {

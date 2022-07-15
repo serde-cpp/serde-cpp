@@ -19,10 +19,16 @@ namespace serde {
 /// string to any datatype.
 class Serializer {
 public:
+  // serde::serialize should be implemented (specialized) for user types.
+  // most std types have builtin implementation from the library
   template<typename T>
   void serialize(T&& v) { serde::serialize(*this, v); }
 
   // Scalars ///////////////////////////////////////////////////////////////////
+  // note: prefer using serde::serialize() for fixed width integer types:
+  // int8_t, int16_t, int32_t, uint64_t, size_t ...
+  // as they will get resolved to corresponding char, int, long datatypes by
+  // the compiler and serde::serialize() is implemented for the scalars below.
   virtual void serialize_bool(bool v) = 0;
   virtual void serialize_int(int v) = 0;
   virtual void serialize_uint(unsigned int v) = 0;
@@ -30,15 +36,17 @@ public:
   virtual void serialize_llint(long long int v) = 0;
   virtual void serialize_luint(unsigned long int v) = 0;
   virtual void serialize_lluint(unsigned long long int v) = 0;
-  virtual void serialize_float(int v) = 0;
-  virtual void serialize_double(int v) = 0;
+  virtual void serialize_float(float v) = 0;
+  virtual void serialize_double(double v) = 0;
   virtual void serialize_char(char v) = 0;
+  virtual void serialize_uchar(unsigned char v) = 0;
   virtual void serialize_cstr(const char* v) = 0;
   virtual void serialize_bytes(unsigned char* v, size_t len) = 0;
 
   // Optional //////////////////////////////////////////////////////////////////
   template<typename T>
-  void serialize_some(T &&v) { serialize(v); }
+  void serialize_some(T &&v) { serialize_some_next(); serialize(v); }
+  virtual void serialize_some_next() = 0;
   virtual void serialize_none() = 0;
 
   // Sequence //////////////////////////////////////////////////////////////////
