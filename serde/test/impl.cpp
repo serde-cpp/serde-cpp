@@ -11,6 +11,7 @@ enum class Numbers {
 struct Point {
   int x;
   int y;
+  Numbers num;
 };
 
 } // namespace types
@@ -25,6 +26,18 @@ void serde::serialize(serde::Serializer& ser, const types::Numbers& number)
     case types::Numbers::Three: cstr = "Three"; break;
   }
   ser.serialize_cstr(cstr);
+}
+
+template<>
+void serde::deserialize(serde::Deserializer& de, types::Numbers& number)
+{
+  char cstr[32] = {0};
+  de.deserialize_cstr((char*)cstr, sizeof(cstr));
+  std::string_view str(cstr);
+  if (str == "One") number = types::Numbers::One;
+  else if (str == "Two") number = types::Numbers::Two;
+  else if (str == "Three") number = types::Numbers::Three;
+  else return; // TODO: mark error
 }
 
 template<>
@@ -91,3 +104,12 @@ void serde::serialize(serde::Serializer& ser, const types::Point& point)
   ser.serialize_seq_end();
 }
 
+template<>
+void serde::deserialize(serde::Deserializer& de, types::Point& point)
+{
+  de.deserialize_seq_begin();
+    de.deserialize_i32(point.x);
+    de.deserialize_i32(point.y);
+    de.deserialize(point.num);
+  de.deserialize_seq_end();
+}

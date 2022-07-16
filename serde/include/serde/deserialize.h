@@ -6,6 +6,7 @@
 namespace serde {
 
 template<typename T>
-Error deserialize(class Deserializer& ser, std::decay_t<T>& v);
+void deserialize(class Deserializer& de, T& v);
 
 } // namespace serde
+

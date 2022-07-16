@@ -47,13 +47,13 @@ inline void serialize_unsigned_integer(Serializer& ser, const T& val) {
 } // namespace detail
 
 template<>
-inline void serialize(Serializer& ser, const short int& v)
+inline void serialize(Serializer& ser, const int& v)
 {
   detail::serialize_signed_integer(ser, v);
 }
 
 template<>
-inline void serialize(Serializer& ser, const int& v)
+inline void serialize(Serializer& ser, const short int& v)
 {
   detail::serialize_signed_integer(ser, v);
 }
@@ -71,13 +71,13 @@ inline void serialize(Serializer& ser, const long long int& v)
 }
 
 template<>
-inline void serialize(Serializer& ser, const short unsigned int& v)
+inline void serialize(Serializer& ser, const unsigned int& v)
 {
   detail::serialize_unsigned_integer(ser, v);
 }
 
 template<>
-inline void serialize(Serializer& ser, const unsigned int& v)
+inline void serialize(Serializer& ser, const short unsigned int& v)
 {
   detail::serialize_unsigned_integer(ser, v);
 }

@@ -5,14 +5,21 @@
 
 namespace types {
 
+enum class Numbers {
+  One,
+  Two,
+  Three,
+};
+
 struct Point {
   int x;
   int y;
+  Numbers num;
 };
 
 } // namespace point
 
-TEST(Main, Test)
+TEST(Main, Serialize)
 {
   types::Point point;
   point.x = 10; point.y = 20;
@@ -43,3 +50,10 @@ TEST(Main, Test)
 )");
 }
 
+
+TEST(Main, Deserialize)
+{
+  using ::types::Point;
+  Point point = serde_yaml::from_str<Point>("[10,20,Three]").unwrap();
+  std::cout << "point: " << point.x << " " << point.y << " " << (int)point.num << std::endl;
+}

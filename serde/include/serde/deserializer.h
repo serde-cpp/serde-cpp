@@ -5,17 +5,32 @@
 
 namespace serde {
 
-
 class Deserializer {
 public:
-  using Result = ::Result<void, Error>;
-  template<typename T> Result deserialize(std::decay_t<T>& v) {
-    serde::deserialize(*this, v);
-  }
+  template<typename T>
+  inline void deserialize(T& v) { serde::deserialize(*this, v); }
 
-  //virtual Result deserialize_bool(bool& v) = 0;
-  //virtual Result deserialize_int(int& v) = 0;
-  //virtual Result deserialize_cstr(char*& v, size_t n) = 0;
+  // Scalars ///////////////////////////////////////////////////////////////////
+  virtual void deserialize_bool(bool&) = 0;
+  virtual void deserialize_i8(int8_t&) = 0;
+  virtual void deserialize_u8(uint8_t&) = 0;
+  virtual void deserialize_i16(int16_t&) = 0;
+  virtual void deserialize_u16(uint16_t&) = 0;
+  virtual void deserialize_i32(int32_t&) = 0;
+  virtual void deserialize_u32(uint32_t&) = 0;
+  virtual void deserialize_i64(int64_t&) = 0;
+  virtual void deserialize_u64(uint64_t&) = 0;
+  virtual void deserialize_float(float&) = 0;
+  virtual void deserialize_double(double&) = 0;
+  virtual void deserialize_char(char&) = 0;
+  virtual void deserialize_uchar(unsigned char&) = 0;
+  virtual void deserialize_cstr(char*, size_t len) = 0;
+  virtual void deserialize_bytes(unsigned char* val, size_t len) = 0;
+
+  // Sequence //////////////////////////////////////////////////////////////////
+  virtual void deserialize_seq_begin() = 0;
+  virtual void deserialize_seq_count(size_t&) = 0;
+  virtual void deserialize_seq_end() = 0;
 };
 
 } // namespace serde
