@@ -22,6 +22,7 @@ Roadmap
   - [ ] xml
   - [ ] protobuf/flatbuffers/flexbuffers?
 - [ ] Builtin std types serialization 
+  - [ ] string, string\_view
   - [ ] vector, array
   - [ ] map, unordered\_map
   - [ ] set, unordered\_set

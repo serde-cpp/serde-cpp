@@ -22,18 +22,20 @@ public:
 
   // Scalars ///////////////////////////////////////////////////////////////////
   void serialize_bool(bool v) final { serialize_scalar(v); }
-  void serialize_int(int v) final { serialize_scalar(v); }
-  void serialize_uint(unsigned int v) final { serialize_scalar(v); }
-  void serialize_lint(long int v) final { serialize_scalar(v); }
-  void serialize_llint(long long int v) final { serialize_scalar(v); }
-  void serialize_luint(unsigned long int v) final { serialize_scalar(v); }
-  void serialize_lluint(unsigned long long int v) final { serialize_scalar(v); }
+  void serialize_i8(int8_t v) final { serialize_scalar(v); }
+  void serialize_u8(uint8_t v) final { serialize_scalar(v); }
+  void serialize_i16(int16_t v) final { serialize_scalar(v); }
+  void serialize_u16(uint16_t v) final { serialize_scalar(v); }
+  void serialize_i32(int32_t v) final { serialize_scalar(v); }
+  void serialize_u32(uint32_t v) final { serialize_scalar(v); }
+  void serialize_i64(int64_t v) final { serialize_scalar(v); }
+  void serialize_u64(uint64_t v) final { serialize_scalar(v); }
   void serialize_float(float v) final { serialize_scalar(v); }
   void serialize_double(double v) final { serialize_scalar(v); }
   void serialize_char(char v) final { serialize_scalar(v); }
   void serialize_uchar(unsigned char v) final { serialize_scalar(v); }
   void serialize_cstr(const char* v) final { serialize_scalar(v); }
-  void serialize_bytes(unsigned char* v, size_t len) final {
+  void serialize_bytes(unsigned char* val, size_t len) final {
   }
 
   // Optional //////////////////////////////////////////////////////////////////

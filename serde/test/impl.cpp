@@ -33,17 +33,17 @@ void serde::serialize(serde::Serializer& ser, const types::Point& point)
   ser.serialize_seq_begin();
 
     ser.serialize_seq_begin();
-      ser.serialize_int(point.x);
-      ser.serialize_int(point.y);
+      ser.serialize_i32(point.x);
+      ser.serialize_i32(point.y);
     ser.serialize_seq_end();
     ser.serialize_seq_begin();
       ser.serialize_seq_begin();
-        ser.serialize_int(point.x);
-        ser.serialize_int(point.y);
+        ser.serialize_i32(point.x);
+        ser.serialize_i32(point.y);
       ser.serialize_seq_end();
       ser.serialize_seq_begin();
-        ser.serialize_int(point.x);
-        ser.serialize_int(point.y);
+        ser.serialize_i32(point.x);
+        ser.serialize_i32(point.y);
       ser.serialize_seq_end();
     ser.serialize_seq_end();
 

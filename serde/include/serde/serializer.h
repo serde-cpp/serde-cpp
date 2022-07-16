@@ -22,30 +22,32 @@ public:
   // serde::serialize should be implemented (specialized) for user types.
   // most std types have builtin implementation from the library
   template<typename T>
-  void serialize(T&& v) { serde::serialize(*this, v); }
+  inline void serialize(T&& v) { serde::serialize(*this, v); }
 
   // Scalars ///////////////////////////////////////////////////////////////////
-  // note: prefer using serde::serialize() for fixed width integer types:
-  // int8_t, int16_t, int32_t, uint64_t, size_t ...
-  // as they will get resolved to corresponding char, int, long datatypes by
-  // the compiler and serde::serialize() is implemented for the scalars below.
-  virtual void serialize_bool(bool v) = 0;
-  virtual void serialize_int(int v) = 0;
-  virtual void serialize_uint(unsigned int v) = 0;
-  virtual void serialize_lint(long int v) = 0;
-  virtual void serialize_llint(long long int v) = 0;
-  virtual void serialize_luint(unsigned long int v) = 0;
-  virtual void serialize_lluint(unsigned long long int v) = 0;
-  virtual void serialize_float(float v) = 0;
-  virtual void serialize_double(double v) = 0;
-  virtual void serialize_char(char v) = 0;
-  virtual void serialize_uchar(unsigned char v) = 0;
-  virtual void serialize_cstr(const char* v) = 0;
-  virtual void serialize_bytes(unsigned char* v, size_t len) = 0;
+  // note: prefer using serde::serialize() for standard types
+  // int, unsigned int, short int, long int, size_t, intptr_t ...
+  // as they will get resolved to corresponding fixed width integer types by
+  // the compiler and serde::serialize() is implemented for those scalars.
+  virtual void serialize_bool(bool) = 0;
+  virtual void serialize_i8(int8_t) = 0;
+  virtual void serialize_u8(uint8_t) = 0;
+  virtual void serialize_i16(int16_t) = 0;
+  virtual void serialize_u16(uint16_t) = 0;
+  virtual void serialize_i32(int32_t) = 0;
+  virtual void serialize_u32(uint32_t) = 0;
+  virtual void serialize_i64(int64_t) = 0;
+  virtual void serialize_u64(uint64_t) = 0;
+  virtual void serialize_float(float) = 0;
+  virtual void serialize_double(double) = 0;
+  virtual void serialize_char(char) = 0;
+  virtual void serialize_uchar(unsigned char) = 0;
+  virtual void serialize_cstr(const char*) = 0;
+  virtual void serialize_bytes(unsigned char* val, size_t len) = 0;
 
   // Optional //////////////////////////////////////////////////////////////////
   template<typename T>
-  void serialize_some(T &&v) { serialize_some_next(); serialize(v); }
+  inline void serialize_some(T &&v) { serialize_some_next(); serialize(v); }
   virtual void serialize_some_next() = 0;
   virtual void serialize_none() = 0;
 
@@ -62,21 +64,21 @@ public:
   virtual void serialize_map_value_end() = 0;
 
   template<typename K>
-  void serialize_map_key(K&& key) {
+  inline void serialize_map_key(K&& key) {
     serialize_map_key_begin();
     serialize(std::decay_t<K>(key));
     serialize_map_key_end();
   }
 
   template<typename V>
-  void serialize_map_value(V&& value) {
+  inline void serialize_map_value(V&& value) {
     serialize_map_value_begin();
     serialize(value);
     serialize_map_value_end();
   }
 
   template<typename K, typename V>
-  void serialize_map_entry(K&& key, V&& value) {
+  inline void serialize_map_entry(K&& key, V&& value) {
     serialize_map_key(key);
     serialize_map_value(value);
   }
@@ -88,7 +90,7 @@ public:
   virtual void serialize_struct_field_end() = 0;
 
   template<typename V>
-  void serialize_struct_field(const char* name, V&& value) {
+  inline void serialize_struct_field(const char* name, V&& value) {
     serialize_struct_field_begin(name);
     serialize(value);
     serialize_struct_field_end();
