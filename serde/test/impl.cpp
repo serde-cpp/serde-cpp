@@ -107,9 +107,15 @@ void serde::serialize(serde::Serializer& ser, const types::Point& point)
 template<>
 void serde::deserialize(serde::Deserializer& de, types::Point& point)
 {
-  de.deserialize_seq_begin();
-    de.deserialize_i32(point.x);
-    de.deserialize_i32(point.y);
-    de.deserialize(point.num);
-  de.deserialize_seq_end();
+  //de.deserialize_seq_begin();
+    //de.deserialize(point.x);
+    //de.deserialize(point.y);
+    //de.deserialize(point.num);
+  //de.deserialize_seq_end();
+
+  char key;
+  de.deserialize_map_begin();
+    de.deserialize_map_entry(key, point.x);
+    de.deserialize_map_entry(key, point.y);
+  de.deserialize_map_end();
 }

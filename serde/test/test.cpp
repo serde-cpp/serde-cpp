@@ -54,6 +54,6 @@ TEST(Main, Serialize)
 TEST(Main, Deserialize)
 {
   using ::types::Point;
-  Point point = serde_yaml::from_str<Point>("[10,20,Three]").unwrap();
+  Point point = serde_yaml::from_str<Point>("{x: 0x10, y: 0x20}").unwrap();
   std::cout << "point: " << point.x << " " << point.y << " " << (int)point.num << std::endl;
 }

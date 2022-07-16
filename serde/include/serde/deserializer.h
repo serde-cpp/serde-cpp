@@ -27,10 +27,40 @@ public:
   virtual void deserialize_cstr(char*, size_t len) = 0;
   virtual void deserialize_bytes(unsigned char* val, size_t len) = 0;
 
+  // Optional //////////////////////////////////////////////////////////////////
+
   // Sequence //////////////////////////////////////////////////////////////////
   virtual void deserialize_seq_begin() = 0;
   virtual void deserialize_seq_count(size_t&) = 0;
   virtual void deserialize_seq_end() = 0;
+
+  // Map ///////////////////////////////////////////////////////////////////////
+  virtual void deserialize_map_begin() = 0;
+  virtual void deserialize_map_end() = 0;
+  virtual void deserialize_map_key_begin() = 0;
+  virtual void deserialize_map_key_end() = 0;
+  virtual void deserialize_map_value_begin() = 0;
+  virtual void deserialize_map_value_end() = 0;
+
+  template<typename K>
+  inline void deserialize_map_key(K& key) {
+    deserialize_map_key_begin();
+    deserialize(key);
+    deserialize_map_key_end();
+  }
+
+  template<typename V>
+  inline void deserialize_map_value(V& value) {
+    deserialize_map_value_begin();
+    deserialize(value);
+    deserialize_map_value_end();
+  }
+
+  template<typename K, typename V>
+  inline void deserialize_map_entry(K& key, V& value) {
+    deserialize_map_key(key);
+    deserialize_map_value(value);
+  }
 };
 
 } // namespace serde
