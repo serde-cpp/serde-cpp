@@ -73,7 +73,7 @@ public:
 
   void deserialize_cstr(char* val, size_t len) final {
     auto& curr = stack.top();
-    if (!curr.is_val() || !curr.valid() || curr.is_seed()) {
+    if (!curr.has_val() || !curr.valid() || curr.is_seed()) {
       std::cerr << "no value to extract" << std::endl;
       return; // TODO: mark error
     }
@@ -125,6 +125,15 @@ public:
     }
     //std::cout << "num_children "  << curr.num_children() << std::endl;
     stack.push(curr.first_child());
+  }
+
+  void deserialize_map_count(size_t& val) final {
+    auto curr = stack.top();
+    if (!curr.is_map()) {
+      std::cerr << "no map to count" << std::endl;
+      return;
+    }
+    val = curr.num_children();
   }
 
   void deserialize_map_end() final {

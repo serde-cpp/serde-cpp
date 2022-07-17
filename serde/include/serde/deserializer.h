@@ -36,6 +36,7 @@ public:
 
   // Map ///////////////////////////////////////////////////////////////////////
   virtual void deserialize_map_begin() = 0;
+  virtual void deserialize_map_count(size_t&) = 0;
   virtual void deserialize_map_end() = 0;
   virtual void deserialize_map_key_begin() = 0;
   virtual void deserialize_map_key_end() = 0;
@@ -76,7 +77,7 @@ public:
   virtual void deserialize_struct_field_end() = 0;
 
   template<typename V>
-  inline void deserialize_struct_field(const char* name, V&& value) {
+  inline void deserialize_struct_field(const char* name, V& value) {
     deserialize_struct_field_begin(name);
     deserialize(value);
     deserialize_struct_field_end();

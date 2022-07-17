@@ -35,4 +35,4 @@ Roadmap
   - [ ] forward-declarations
   - [ ] foreign-types
   - [ ] additional attributes (skip, rename, getter, setter, ...)
-
+- [ ] Validate serde calls (seq/map utils) at interface level before impl (protected virtual)
