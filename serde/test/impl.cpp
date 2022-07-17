@@ -113,9 +113,19 @@ void serde::deserialize(serde::Deserializer& de, types::Point& point)
     //de.deserialize(point.num);
   //de.deserialize_seq_end();
 
-  char key;
-  de.deserialize_map_begin();
-    de.deserialize_map_entry(key, point.x);
-    de.deserialize_map_entry(key, point.y);
-  de.deserialize_map_end();
+  //char key;
+  //de.deserialize_map_begin();
+    //de.deserialize_map_entry(key, point.x);
+    //de.deserialize_map_entry(key, point.y);
+  //de.deserialize_map_end();
+
+  //de.deserialize_map_begin();
+    //de.deserialize_map_entry_find("x", point.x);
+    //de.deserialize_map_entry_find("y", point.y);
+  //de.deserialize_map_end();
+
+  de.deserialize_struct_begin();
+    de.deserialize_struct_field("x", point.x);
+    de.deserialize_struct_field("y", point.y);
+  de.deserialize_struct_end();
 }

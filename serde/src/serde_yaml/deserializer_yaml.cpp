@@ -16,6 +16,7 @@ class YamlDeserializer final : public serde::Deserializer {
   ryml::Tree tree;
   std::stack<ryml::NodeRef> stack;
   bool expect_key = false;
+  bool entry_find = false;
 
 public:
   YamlDeserializer(std::string yaml) : yaml(std::move(yaml)) {
@@ -125,24 +126,65 @@ public:
     //std::cout << "num_children "  << curr.num_children() << std::endl;
     stack.push(curr.first_child());
   }
+
   void deserialize_map_end() final {
     stack.pop();
   }
+
   void deserialize_map_key_begin() final {
     // TODO: check for has_key
     //std::cout << "expect key" << std::endl;
     expect_key = true;
   }
+
   void deserialize_map_key_end() final {
     // TODO: check for was true
     //std::cout << "unexpect key" << std::endl;
     expect_key = false;
   }
+
+  void deserialize_map_key_find(const char* key) final {
+    auto curr = stack.top();
+    if (!curr.parent_is_map()) {
+      std::cerr << "no map to find key" << std::endl;
+      return;
+    }
+    auto child = curr.find_sibling({key, std::strlen(key)});
+    if (!child.valid() || child.is_seed() || !child.get()) {
+      std::cerr << "key not found in map" << std::endl;
+      return;
+    }
+    stack.push(child);
+    entry_find = true;
+  }
+
   void deserialize_map_value_begin() final {
   }
   void deserialize_map_value_end() final {
     auto& curr = stack.top();
-    curr = curr.next_sibling();
+    if (entry_find) {
+      stack.pop();
+    } else {
+      curr = curr.next_sibling();
+    }
+  }
+
+  // Struct ////////////////////////////////////////////////////////////////////
+  void deserialize_struct_begin() final {
+    deserialize_map_begin();
+  }
+
+  void deserialize_struct_end() final {
+    deserialize_map_end();
+  }
+
+  void deserialize_struct_field_begin(const char* name) final {
+    deserialize_map_key_find(name);
+    deserialize_map_value_begin();
+  }
+
+  void deserialize_struct_field_end() final {
+    deserialize_map_value_end();
   }
 
 };

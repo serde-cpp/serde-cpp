@@ -39,6 +39,7 @@ public:
   virtual void deserialize_map_end() = 0;
   virtual void deserialize_map_key_begin() = 0;
   virtual void deserialize_map_key_end() = 0;
+  virtual void deserialize_map_key_find(const char* key) = 0;
   virtual void deserialize_map_value_begin() = 0;
   virtual void deserialize_map_value_end() = 0;
 
@@ -61,6 +62,28 @@ public:
     deserialize_map_key(key);
     deserialize_map_value(value);
   }
+
+  template<typename V>
+  inline void deserialize_map_entry_find(const char* key, V& value) {
+    deserialize_map_key_find(key);
+    deserialize_map_value(value);
+  }
+
+  // Struct ////////////////////////////////////////////////////////////////////
+  virtual void deserialize_struct_begin() = 0;
+  virtual void deserialize_struct_end() = 0;
+  virtual void deserialize_struct_field_begin(const char* name) = 0;
+  virtual void deserialize_struct_field_end() = 0;
+
+  template<typename V>
+  inline void deserialize_struct_field(const char* name, V&& value) {
+    deserialize_struct_field_begin(name);
+    deserialize(value);
+    deserialize_struct_field_end();
+  }
+
+  // Destructor
+  virtual ~Deserializer() = default;
 };
 
 } // namespace serde
