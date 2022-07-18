@@ -23,41 +23,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -pg -fsanitize=undefined -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -Wall")
 
 #########################################################################################
-# Dependencies
+# Libraries
 #########################################################################################
-# GoogleTest for unit testing
-find_package(GTest REQUIRED)
-# RapidYaml for parsing and emitting YAML
-find_package(ryml REQUIRED)
-
-#########################################################################################
-# Library
-#########################################################################################
-add_library(serde STATIC)
-target_sources(serde PRIVATE
-  src/serde_yaml/serializer_yaml.cpp
-  src/serde_yaml/deserializer_yaml.cpp
-)
-target_include_directories(serde PUBLIC ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(serde PRIVATE ryml::ryml)
-install(TARGETS serde)
-
-#########################################################################################
-# Tests
-#########################################################################################
-add_executable(serde_test)
-target_sources(serde_test PRIVATE
-  test/test.cpp
-  test/impl.cpp
-)
-target_include_directories(serde_test PRIVATE
-  ${CMAKE_SOURCE_DIR}/include
-)
-target_link_libraries(serde_test PRIVATE
-  serde
-  ryml::ryml
-  GTest::gmock_main
-  GTest::gmock
-  GTest::gtest
-)
+add_subdirectory(serde)
+add_subdirectory(serde_yaml)
 

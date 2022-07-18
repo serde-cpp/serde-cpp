@@ -28,10 +28,10 @@ add_subdirectory(external)
 #########################################################################################
 # Project
 #########################################################################################
-message(STATUS "Adding sub-project: serde")
-ExternalProject_Add(serde
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/serde
-    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/serde
+message(STATUS "Adding sub-project: serde-cpp")
+ExternalProject_Add(serde-cpp
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/serde-cpp
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/serde-cpp
     BUILD_ALWAYS 1
     CMAKE_ARGS
         -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
@@ -42,3 +42,4 @@ ExternalProject_Add(serde
     DEPENDS
         rapidyaml_external
         googletest_external)
+
