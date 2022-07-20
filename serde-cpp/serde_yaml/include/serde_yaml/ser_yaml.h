@@ -4,7 +4,7 @@
 #include <serde/error.h>
 #include <serde/result.h>
 #include <serde/serializer.h>
-#include "ser_detail.h"
+#include "detail/ser_detail.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serde YAML
