@@ -20,6 +20,7 @@ target_link_libraries(serde_yaml
   PRIVATE ryml::ryml
 )
 install(TARGETS serde_yaml)
+install(DIRECTORY include/serde_yaml DESTINATION include)
 
 #########################################################################################
 # Tests
