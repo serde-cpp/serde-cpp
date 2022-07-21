@@ -28,6 +28,8 @@ public:
   virtual void deserialize_bytes(unsigned char* val, size_t len) = 0;
 
   // Optional //////////////////////////////////////////////////////////////////
+  virtual void deserialize_is_some(bool&) = 0;
+  virtual void deserialize_none() = 0;
 
   // Sequence //////////////////////////////////////////////////////////////////
   virtual void deserialize_seq_begin() = 0;

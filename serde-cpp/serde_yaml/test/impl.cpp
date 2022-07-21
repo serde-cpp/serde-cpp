@@ -1,8 +1,10 @@
 #include "serde/serde.h"
+#include <optional> // TODO remove
+#include <memory>
 
 namespace types {
 
-enum class Numbers {
+enum class Number {
   One,
   Two,
   Three,
@@ -11,32 +13,32 @@ enum class Numbers {
 struct Point {
   int x;
   int y;
-  Numbers num;
+  Number num;
 };
 
 } // namespace types
 
 template<>
-void serde::serialize(serde::Serializer& ser, const types::Numbers& number)
+void serde::serialize(serde::Serializer& ser, const types::Number& number)
 {
   const char* cstr = "<null>";
   switch (number) {
-    case types::Numbers::One: cstr = "One"; break;
-    case types::Numbers::Two: cstr = "Two"; break;
-    case types::Numbers::Three: cstr = "Three"; break;
+    case types::Number::One: cstr = "One"; break;
+    case types::Number::Two: cstr = "Two"; break;
+    case types::Number::Three: cstr = "Three"; break;
   }
   ser.serialize_cstr(cstr);
 }
 
 template<>
-void serde::deserialize(serde::Deserializer& de, types::Numbers& number)
+void serde::deserialize(serde::Deserializer& de, types::Number& number)
 {
   char cstr[32] = {0};
   de.deserialize_cstr((char*)cstr, sizeof(cstr));
   std::string_view str(cstr);
-  if (str == "One") number = types::Numbers::One;
-  else if (str == "Two") number = types::Numbers::Two;
-  else if (str == "Three") number = types::Numbers::Three;
+  if (str == "One") number = types::Number::One;
+  else if (str == "Two") number = types::Number::Two;
+  else if (str == "Three") number = types::Number::Three;
   else return; // TODO: mark error
 }
 
@@ -87,9 +89,9 @@ void serde::serialize(serde::Serializer& ser, const types::Point& point)
     ser.serialize_struct_field("s", point.x);
   ser.serialize_struct_end();
 
-  std::vector<types::Numbers> vec = {types::Numbers::One,
-                                     types::Numbers::Two,
-                                     types::Numbers::Three};
+  std::vector<types::Number> vec = {types::Number::One,
+                                     types::Number::Two,
+                                     types::Number::Three};
   ser.serialize(vec);
 
   ser.serialize_struct_begin();
@@ -129,6 +131,8 @@ void serde::deserialize(serde::Deserializer& de, types::Point& point)
   de.deserialize_struct_begin();
     de.deserialize_struct_field("x", point.x);
     de.deserialize_struct_field("y", point.y);
-    de.deserialize_struct_field("num", point.num);
+    std::optional<types::Number> num;
+    de.deserialize_struct_field("num", num);
+    point.num = *num;
   de.deserialize_struct_end();
 }

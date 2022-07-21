@@ -21,6 +21,7 @@ Roadmap
   - [ ] toml
   - [ ] xml
   - [ ] protobuf/flatbuffers/flexbuffers?
+- [ ] Deserialize complex types (non-default-constructible)
 - [ ] Builtin std types serialization 
   - [ ] string, string\_view
   - [ ] vector, array

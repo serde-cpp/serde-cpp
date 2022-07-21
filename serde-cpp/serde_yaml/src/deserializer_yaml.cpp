@@ -88,6 +88,36 @@ public:
   void deserialize_bytes(unsigned char* val, size_t len) final {
   }
 
+  // Optional //////////////////////////////////////////////////////////////////
+  void deserialize_is_some(bool& val) final {
+    val = true;
+  }
+  void deserialize_none() final {
+    auto& curr = stack.top();
+    if (!curr.valid() || curr.is_seed() || !curr.get()) {
+      std::cerr << "not valid node to extract none" << std::endl;
+      return; // TODO: mark error
+    }
+    if (expect_key) {
+      if (curr.has_key()) {
+        //std::cout << "got key " << val << std::endl;
+      }
+      else {
+        std::cerr << "no key to extract none" << std::endl;
+      }
+    }
+    else if (curr.has_val()) {
+      //std::cout << "got val " << val << std::endl;
+      if (curr.parent_is_seq()) {
+        //std::cout << "next_sibling" << std::endl;
+        curr = curr.next_sibling();
+      }
+    }
+    else {
+      std::cerr << "no value to extract none" << std::endl;
+    }
+  }
+
 
   void deserialize_seq_begin() final {
     auto curr = stack.top();

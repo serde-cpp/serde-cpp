@@ -5,7 +5,7 @@
 
 namespace types {
 
-enum class Numbers {
+enum class Number {
   One,
   Two,
   Three,
@@ -14,7 +14,7 @@ enum class Numbers {
 struct Point {
   int x;
   int y;
-  Numbers num;
+  Number num;
 };
 
 } // namespace point

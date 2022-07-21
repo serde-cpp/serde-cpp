@@ -46,9 +46,6 @@ public:
   virtual void serialize_bytes(unsigned char* val, size_t len) = 0;
 
   // Optional //////////////////////////////////////////////////////////////////
-  template<typename T>
-  inline void serialize_some(T &&v) { serialize_some_next(); serialize(v); }
-  virtual void serialize_some_next() = 0;
   virtual void serialize_none() = 0;
 
   // Sequence //////////////////////////////////////////////////////////////////

@@ -4,6 +4,9 @@
 #include "deserialize.h"
 #include "deserializer.h"
 
+#include <vector>
+#include <optional> // TODO: move to std/optional.h
+
 namespace serde {
 
 // Primitives /////////////////////////////////////////////////////////////////
@@ -130,15 +133,36 @@ inline void deserialize(Deserializer& de, unsigned char& v)
 
 // Vector /////////////////////////////////////////////////////////////////////
 
-//template<template<typename...> typename T, typename... U>
-//inline void deserialize(Deserializer& de, T<U...> const& vec)
-//{
-  //de.deserialize_seq_begin();
-  //for (auto& v : vec) de.deserialize(v);
-  //de.deserialize_seq_end();
-//}
+template<>
+struct Deserialize<std::vector> {
+  template<typename... U>
+  static void deserialize(Deserializer& de, std::vector<U...>& vec) {
+    de.deserialize_seq_begin();
+    for (auto& v : vec)
+      de.deserialize(v);
+    de.deserialize_seq_end();
+  }
+};
+
+// Optional /////////////////////////////////////////////////////////////////////
+
+template<>
+struct Deserialize<std::optional> {
+  template<typename U>
+  static void deserialize(Deserializer& de, std::optional<U>& val) {
+    bool some = false;
+    de.deserialize_is_some(some);
+    if (some) {
+      typename std::optional<U>::value_type inner_val;
+      de.deserialize(inner_val);
+      val = std::move(inner_val);
+    }
+    else {
+      de.deserialize_none();
+      val = std::nullopt;
+    }
+  }
+};
 
 } // namespace serde
-
-
 
