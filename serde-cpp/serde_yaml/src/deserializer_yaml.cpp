@@ -90,8 +90,28 @@ public:
 
   // Optional //////////////////////////////////////////////////////////////////
   void deserialize_is_some(bool& val) final {
-    val = true;
+    auto& curr = stack.top();
+    if (!curr.valid() || curr.is_seed() || !curr.get()) {
+      std::cerr << "not valid node to check for some" << std::endl;
+      return; // TODO: mark error
+    }
+    if (expect_key) {
+      if (curr.has_key()) {
+        //std::cout << "got key " << val << std::endl;
+        val = !curr.key_is_null();
+      }
+      else {
+        std::cerr << "no key to check for some" << std::endl;
+      }
+    }
+    else if (curr.has_val()) {
+      val = !curr.val_is_null();
+    }
+    else {
+      std::cerr << "no value to check for some" << std::endl;
+    }
   }
+
   void deserialize_none() final {
     auto& curr = stack.top();
     if (!curr.valid() || curr.is_seed() || !curr.get()) {
