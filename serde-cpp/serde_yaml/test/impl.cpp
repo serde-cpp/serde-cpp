@@ -33,8 +33,11 @@ void serde::serialize(serde::Serializer& ser, const types::Number& number)
 template<>
 void serde::deserialize(serde::Deserializer& de, types::Number& number)
 {
-  char cstr[32] = {0};
+  //char cstr[32] = {0};
+  std::string cstr;
+  //std::cout << cstr << " len" << cstr.length() << std::endl;
   de.deserialize(cstr);
+  std::cout << cstr << " len" << cstr.length() << std::endl;
   std::string_view str(cstr);
   if (str == "One") number = types::Number::One;
   else if (str == "Two") number = types::Number::Two;

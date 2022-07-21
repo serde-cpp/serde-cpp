@@ -24,8 +24,10 @@ public:
   virtual void deserialize_double(double&) = 0;
   virtual void deserialize_char(char&) = 0;
   virtual void deserialize_uchar(unsigned char&) = 0;
-  virtual void deserialize_cstr(char*, size_t len) = 0;
+  virtual void deserialize_cstr(char*, size_t len) = 0; /* null-terminated */
   virtual void deserialize_bytes(unsigned char* val, size_t len) = 0;
+  virtual void deserialize_length(size_t& len) = 0;
+  void deserialize_length_cstr(size_t& len) { deserialize_length(len); len+=1; /* null-terminated */ }
 
   // Optional //////////////////////////////////////////////////////////////////
   virtual void deserialize_is_some(bool&) = 0;

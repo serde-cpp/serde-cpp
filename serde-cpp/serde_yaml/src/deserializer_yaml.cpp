@@ -78,14 +78,41 @@ public:
       return; // TODO: mark error
     }
     auto cstr = curr.val();
-    len = std::min(cstr.len, len);
-    if (len) std::strncpy(val, cstr.data(), len);
+    len = std::min(cstr.len + 1, len);
+    if (len) {
+      std::strncpy(val, cstr.data(), len);
+      val[len-1] = '\0';
+    }
+
     //if (curr.parent_is_seq()) {
       ////std::cout << "next_sibling" << std::endl;
       //curr = curr.next_sibling();
     //}
   }
   void deserialize_bytes(unsigned char* val, size_t len) final {
+  }
+
+  void deserialize_length(size_t& len) final {
+    auto& curr = stack.top();
+    if (!curr.valid() || curr.is_seed() || !curr.get()) {
+      std::cerr << "not valid node to check length" << std::endl;
+      return; // TODO: mark error
+    }
+    if (expect_key) {
+      if (curr.has_key()) {
+        //std::cout << "got key " << val << std::endl;
+        len = curr.key().len;
+      }
+      else {
+        std::cerr << "no key to check length" << std::endl;
+      }
+    }
+    else if (curr.has_val()) {
+      len = curr.val().len;
+    }
+    else {
+      std::cerr << "no value to check length" << std::endl;
+    }
   }
 
   // Optional //////////////////////////////////////////////////////////////////
