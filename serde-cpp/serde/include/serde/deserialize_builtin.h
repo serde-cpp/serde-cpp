@@ -131,6 +131,12 @@ inline void deserialize(Deserializer& de, unsigned char& v)
   //de.deserialize_cstr(cstr);
 //}
 
+template<size_t N>
+inline void deserialize(class Deserializer& de, char (&val)[N])
+{
+  de.deserialize_cstr(val, N);
+}
+
 // Vector /////////////////////////////////////////////////////////////////////
 
 template<>

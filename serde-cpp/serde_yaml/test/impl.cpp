@@ -34,7 +34,7 @@ template<>
 void serde::deserialize(serde::Deserializer& de, types::Number& number)
 {
   char cstr[32] = {0};
-  de.deserialize_cstr((char*)cstr, sizeof(cstr));
+  de.deserialize(cstr);
   std::string_view str(cstr);
   if (str == "One") number = types::Number::One;
   else if (str == "Two") number = types::Number::Two;
