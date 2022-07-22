@@ -37,3 +37,11 @@ Roadmap
   - [ ] foreign-types
   - [ ] additional attributes (skip, rename, getter, setter, ...)
 - [ ] Validate serde calls (seq/map utils) at interface level before impl (protected virtual)
+- [ ] serde test suite
+  - [ ] Invalid hierarchy (map/seq/struct..)
+  - [ ] User Complex types
+- [ ] serde\_attr test suite
+  - [ ] Simple types
+  - [ ] Template types
+- [ ] serde\_yaml test suite
+  - [ ] full api test
