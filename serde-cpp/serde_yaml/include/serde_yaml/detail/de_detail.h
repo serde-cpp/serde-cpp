@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <string>
-#include "serde/deserializer.h"
+#include "serde/de/deserializer.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serde YAML detail

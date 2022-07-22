@@ -1,6 +1,6 @@
 #pragma once
 
-#include "result.h"
+#include "../result.h"
 #include "serialize.h"
 #include "serializer.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "error.h"
-#include "result.h"
+#include "../error.h"
+#include "../result.h"
 #include "serialize.h"
 
 namespace serde {
