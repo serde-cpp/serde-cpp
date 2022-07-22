@@ -1,6 +1,6 @@
-#include "serde/serde.h"
-#include <optional> // TODO remove
 #include <memory>
+#include "serde/serde.h"
+#include "serde/de/std/optional.h"
 
 namespace types {
 
