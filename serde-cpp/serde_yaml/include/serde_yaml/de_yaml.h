@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
+#include <serde/de.h>
 #include <serde/error.h>
 #include <serde/result.h>
-#include <serde/deserializer.h>
 #include "detail/de_detail.h"
 
 ///////////////////////////////////////////////////////////////////////////////

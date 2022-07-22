@@ -27,17 +27,14 @@ void serde::serialize(serde::Serializer& ser, const types::Number& number)
     case types::Number::Two: cstr = "Two"; break;
     case types::Number::Three: cstr = "Three"; break;
   }
-  ser.serialize_cstr(cstr);
+  ser.serialize(cstr);
 }
 
 template<>
 void serde::deserialize(serde::Deserializer& de, types::Number& number)
 {
-  //char cstr[32] = {0};
-  std::string cstr;
-  //std::cout << cstr << " len" << cstr.length() << std::endl;
+  char cstr[32] = {0};
   de.deserialize(cstr);
-  std::cout << cstr << " len" << cstr.length() << std::endl;
   std::string_view str(cstr);
   if (str == "One") number = types::Number::One;
   else if (str == "Two") number = types::Number::Two;

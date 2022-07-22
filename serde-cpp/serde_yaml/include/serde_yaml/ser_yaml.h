@@ -1,9 +1,10 @@
 #pragma once
 
 #include <string>
+#include <serde/ser.h>
 #include <serde/error.h>
 #include <serde/result.h>
-#include <serde/serializer.h>
+
 #include "detail/ser_detail.h"
 
 ///////////////////////////////////////////////////////////////////////////////

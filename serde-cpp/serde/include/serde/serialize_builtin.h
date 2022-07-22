@@ -4,6 +4,9 @@
 #include "serialize.h"
 #include "serializer.h"
 
+#include <vector>
+#include <optional> // TODO: move to ./std/
+
 namespace serde {
 
 // Primitives /////////////////////////////////////////////////////////////////
@@ -119,21 +122,42 @@ inline void serialize(Serializer& ser, const unsigned char& v)
 }
 
 template<>
-inline void serialize(Serializer& ser, const char* const & cstr)
+inline void serialize(Serializer& ser, const char* const& val)
 {
-  ser.serialize_cstr(cstr);
+  ser.serialize_cstr(val);
+}
+
+template<size_t N>
+inline void serialize(Serializer& ser, const char (&val)[N])
+{
+  ser.serialize_cstr(val);
 }
 
 // Vector /////////////////////////////////////////////////////////////////////
 
-template<template<typename...> typename T, typename... U>
-inline void serialize(Serializer& ser, T<U...> const& vec)
-{
-  ser.serialize_seq_begin();
-  for (auto& v : vec) ser.serialize(v);
-  ser.serialize_seq_end();
-}
+template<>
+struct Serialize<std::vector> {
+  template<typename... U>
+  static void serialize(class Serializer& ser, const std::vector<U...>& vec) {
+    ser.serialize_seq_begin();
+    for (auto& v : vec)
+      ser.serialize(v);
+    ser.serialize_seq_end();
+  }
+};
+
+// Optional ///////////////////////////////////////////////////////////////////
+
+template<>
+struct Serialize<std::optional> {
+  template<typename U>
+  static void serialize(class Serializer& ser, const std::optional<U>& val) {
+    if (val.has_value())
+      ser.serialize(*val);
+    else
+      ser.serialize_none();
+  }
+};
 
 } // namespace serde
-
 

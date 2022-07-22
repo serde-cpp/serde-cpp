@@ -128,7 +128,7 @@ inline void deserialize(Deserializer& de, unsigned char& v)
 template<>
 inline void deserialize(Deserializer& de, char* & cstr)
 {
-  throw std::logic_error("Cannot deserialize to char*, max length is unknown. Use char[N] or std::string");
+  throw std::logic_error("Cannot deserialize to char*, length is unknown. Use char[N] or std::string");
 }
 
 template<size_t N>

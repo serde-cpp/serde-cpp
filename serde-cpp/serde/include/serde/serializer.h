@@ -22,7 +22,7 @@ public:
   // serde::serialize should be implemented (specialized) for user types.
   // most std types have builtin implementation from the library
   template<typename T>
-  inline void serialize(T&& v) { serde::serialize(*this, v); }
+  inline void serialize(const T& v) { serde::serialize(*this, v); }
 
   // Scalars ///////////////////////////////////////////////////////////////////
   // note: prefer using serde::serialize() for standard types
@@ -61,21 +61,21 @@ public:
   virtual void serialize_map_value_end() = 0;
 
   template<typename K>
-  inline void serialize_map_key(K&& key) {
+  inline void serialize_map_key(const K& key) {
     serialize_map_key_begin();
-    serialize(std::decay_t<K>(key));
+    serialize(key);
     serialize_map_key_end();
   }
 
   template<typename V>
-  inline void serialize_map_value(V&& value) {
+  inline void serialize_map_value(const V& value) {
     serialize_map_value_begin();
     serialize(value);
     serialize_map_value_end();
   }
 
   template<typename K, typename V>
-  inline void serialize_map_entry(K&& key, V&& value) {
+  inline void serialize_map_entry(const K& key, const V& value) {
     serialize_map_key(key);
     serialize_map_value(value);
   }
@@ -87,7 +87,7 @@ public:
   virtual void serialize_struct_field_end() = 0;
 
   template<typename V>
-  inline void serialize_struct_field(const char* name, V&& value) {
+  inline void serialize_struct_field(const char* name, const V& value) {
     serialize_struct_field_begin(name);
     serialize(value);
     serialize_struct_field_end();

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "result.h"
-#include "error.h"
+#include <cstddef>
 
 namespace serde {
 
