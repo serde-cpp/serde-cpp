@@ -45,3 +45,4 @@ Roadmap
   - [ ] Template types
 - [ ] serde\_yaml test suite
   - [ ] full api test
+- [ ] CMake package
