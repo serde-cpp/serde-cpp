@@ -185,7 +185,7 @@ public:
     stack.pop();
   }
 
-  void deserialize_seq_count(size_t& val) final {
+  void deserialize_seq_size(size_t& val) final {
     auto curr = stack.top();
     if (!curr.is_seq()) {
       std::cerr << "no sequence to count" << std::endl;
@@ -204,7 +204,7 @@ public:
     stack.push(curr.first_child());
   }
 
-  void deserialize_map_count(size_t& val) final {
+  void deserialize_map_size(size_t& val) final {
     auto curr = stack.top();
     if (!curr.is_map()) {
       std::cerr << "no map to count" << std::endl;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <unordered_set>
 
 #include "../deserialize.h"
 #include "../deserializer.h"
@@ -8,9 +8,9 @@
 namespace serde {
 
 template<>
-struct Deserialize<std::set> {
+struct Deserialize<std::unordered_set> {
   template<typename Key, typename... U>
-  static void deserialize(Deserializer& de, std::set<Key, U...>& set) {
+  static void deserialize(Deserializer& de, std::unordered_set<Key, U...>& set) {
     size_t size = 0;
     set.clear();
     de.deserialize_seq_begin();
@@ -25,6 +25,7 @@ struct Deserialize<std::set> {
 };
 
 } // namespace serde
+
 
 
 

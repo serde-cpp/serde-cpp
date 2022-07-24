@@ -1,6 +1,7 @@
 #include <memory>
 #include "serde/serde.h"
 #include "serde/de/std/optional.h"
+#include "serde/de/std/variant.h"
 
 namespace types {
 
@@ -135,4 +136,8 @@ void serde::deserialize(serde::Deserializer& de, types::Point& point)
     de.deserialize_struct_field("num", num);
     point.num = *num;
   de.deserialize_struct_end();
+
+  std::variant<types::Number, int> var;
+  de.deserialize(var);
 }
+

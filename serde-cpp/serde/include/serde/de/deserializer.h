@@ -35,12 +35,12 @@ public:
 
   // Sequence //////////////////////////////////////////////////////////////////
   virtual void deserialize_seq_begin() = 0;
-  virtual void deserialize_seq_count(size_t&) = 0;
+  virtual void deserialize_seq_size(size_t&) = 0;
   virtual void deserialize_seq_end() = 0;
 
   // Map ///////////////////////////////////////////////////////////////////////
   virtual void deserialize_map_begin() = 0;
-  virtual void deserialize_map_count(size_t&) = 0;
+  virtual void deserialize_map_size(size_t&) = 0;
   virtual void deserialize_map_end() = 0;
   virtual void deserialize_map_key_begin() = 0;
   virtual void deserialize_map_key_end() = 0;

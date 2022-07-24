@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 
 #include "../deserialize.h"
 #include "../deserializer.h"
@@ -8,9 +8,9 @@
 namespace serde {
 
 template<>
-struct Deserialize<std::map> {
+struct Deserialize<std::unordered_map> {
   template<typename Key, typename Value, typename... U>
-  static void deserialize(Deserializer& de, std::map<Key, Value, U...>& map) {
+  static void deserialize(Deserializer& de, std::unordered_map<Key, Value, U...>& map) {
     size_t size = 0;
     map.clear();
     de.deserialize_map_begin();
@@ -25,5 +25,6 @@ struct Deserialize<std::map> {
 };
 
 } // namespace serde
+
 
 
