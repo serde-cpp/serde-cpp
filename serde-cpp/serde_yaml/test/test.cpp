@@ -111,3 +111,17 @@ TEST(Optional, Null)
   std::cout << (de_num ? 1 : 0) << std::endl;
   EXPECT_FALSE(de_num.has_value());
 }
+
+TEST(LocalType, One)
+{
+  struct Local {
+    int line;
+    void serialize(serde::Serializer& ser) const { ser.serialize(line); }
+  };
+
+  Local local{100};
+
+  auto str = serde_yaml::to_string(local).unwrap();
+  std::cout << str << std::endl;
+  EXPECT_STREQ(str.c_str(), "100\n");
+}

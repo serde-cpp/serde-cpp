@@ -3,6 +3,7 @@
 #include "../error.h"
 #include "../result.h"
 #include "serialize.h"
+#include "traits.h"
 
 namespace serde {
 
@@ -22,7 +23,10 @@ public:
   // serde::serialize should be implemented (specialized) for user types.
   // most std types have builtin implementation from the library
   template<typename T>
-  inline void serialize(const T& v) { serde::serialize(*this, v); }
+  inline void serialize(const T& v) {
+    if constexpr (traits::HasMemberSerialize<T>::value) v.serialize(*this);
+    else serde::serialize(*this, v);
+  }
 
   // Scalars ///////////////////////////////////////////////////////////////////
   // note: prefer using serde::serialize() for standard types

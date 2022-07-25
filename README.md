@@ -14,22 +14,22 @@ Roadmap
 ---
 
 - [x] Serializer interface
-- [ ] Deserializer interface
-- [ ] Builtin de/serializers
+- [x] Deserializer interface
+- [x] Builtin de/serializers
   - [x] yaml
   - [ ] json
   - [ ] toml
   - [ ] xml
-  - [ ] protobuf/flatbuffers/flexbuffers?
-- [ ] Deserialize complex types (non-default-constructible)
-- [ ] Builtin std types serialization 
+- [x] Deserialize complex types (template types)
+- [ ] Serde for local scope and private user types
+- [x] Builtin std types serialization 
   - [ ] string, string\_view
-  - [ ] vector, array
-  - [ ] map, unordered\_map
-  - [ ] set, unordered\_set
+  - [x] vector, array
+  - [x] map, unordered\_map
+  - [x] set, unordered\_set
   - [ ] tuple, pair
-  - [ ] optional
-  - [ ] variant
+  - [x] optional
+  - [x] variant
 - [ ] Serde generation with attributes for user types
   - [ ] enum
   - [ ] struct (POD type)
