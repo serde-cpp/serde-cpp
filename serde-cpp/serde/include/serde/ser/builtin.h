@@ -133,31 +133,5 @@ inline void serialize(Serializer& ser, const char (&val)[N])
   ser.serialize_cstr(val);
 }
 
-// Vector /////////////////////////////////////////////////////////////////////
-
-template<>
-struct Serialize<std::vector> {
-  template<typename... U>
-  static void serialize(class Serializer& ser, const std::vector<U...>& vec) {
-    ser.serialize_seq_begin();
-    for (auto& v : vec)
-      ser.serialize(v);
-    ser.serialize_seq_end();
-  }
-};
-
-// Optional ///////////////////////////////////////////////////////////////////
-
-template<>
-struct Serialize<std::optional> {
-  template<typename U>
-  static void serialize(class Serializer& ser, const std::optional<U>& val) {
-    if (val.has_value())
-      ser.serialize(*val);
-    else
-      ser.serialize_none();
-  }
-};
-
 } // namespace serde
 

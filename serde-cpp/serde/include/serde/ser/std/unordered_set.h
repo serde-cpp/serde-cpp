@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <unordered_set>
 
 #include "../serialize.h"
 #include "../serializer.h"
@@ -8,9 +8,9 @@
 namespace serde {
 
 template<>
-struct Serialize<std::set> {
+struct Serialize<std::unordered_set> {
   template<typename Key, typename... U>
-  static void serialize(Serializer& ser, const std::set<Key, U...>& set) {
+  static void serialize(Serializer& ser, const std::unordered_set<Key, U...>& set) {
     ser.serialize_seq_begin();
     for (auto& e : set)
       ser.serialize(e);
@@ -19,5 +19,6 @@ struct Serialize<std::set> {
 };
 
 } // namespace serde
+
 
 

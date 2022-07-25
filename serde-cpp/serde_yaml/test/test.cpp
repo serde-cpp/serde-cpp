@@ -3,21 +3,7 @@
 #include "serde/serde.h"
 #include "serde_yaml/serde_yaml.h"
 
-namespace types {
-
-enum class Number {
-  One,
-  Two,
-  Three,
-};
-
-struct Point {
-  int x;
-  int y;
-  Number num;
-};
-
-} // namespace point
+#include "types.h"
 
 TEST(Main, Serialize)
 {
@@ -57,3 +43,4 @@ TEST(Main, Deserialize)
   Point point = serde_yaml::from_str<Point>("{x: 0x10, y: 0x20, num: Three}").unwrap();
   std::cout << "point: " << point.x << " " << point.y << " " << (int)point.num << std::endl;
 }
+

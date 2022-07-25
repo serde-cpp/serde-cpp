@@ -1,23 +1,9 @@
 #include <memory>
+
 #include "serde/serde.h"
-#include "serde/de/std/optional.h"
-#include "serde/de/std/variant.h"
+#include "serde/std.h"
 
-namespace types {
-
-enum class Number {
-  One,
-  Two,
-  Three,
-};
-
-struct Point {
-  int x;
-  int y;
-  Number num;
-};
-
-} // namespace types
+#include "types.h"
 
 template<>
 void serde::serialize(serde::Serializer& ser, const types::Number& number)

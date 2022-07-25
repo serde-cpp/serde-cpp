@@ -20,4 +20,3 @@ struct DeserializeTN<std::array> {
 
 } // namespace serde
 
-

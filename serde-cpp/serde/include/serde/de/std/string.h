@@ -11,7 +11,7 @@ template<>
 struct Deserialize<std::basic_string> {
   template<typename CharT, typename... U>
   static void deserialize(Deserializer& de, std::basic_string<CharT, U...>& str) {
-    static_assert(std::is_same_v<CharT, char>, "deserialize only supports char-based std::string for now");
+    static_assert(std::is_same_v<CharT, char>, "deserialize only supports char-based std::string");
     size_t len = 0;
     de.deserialize_length(len);
     str.resize(len);
