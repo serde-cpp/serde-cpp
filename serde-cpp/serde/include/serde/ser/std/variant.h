@@ -14,14 +14,11 @@ struct Serialize<std::variant> {
     size_t index = variant.index();
     ser.serialize_map_begin();
     ser.serialize_map_key(index);
-    std::visit(overloaded {
-      ([&](const U& val){ ser.serialize(val); }, ...),
+    std::visit([&](const auto& val) {
+      ser.serialize_map_value(val);
     }, variant);
     ser.serialize_map_end();
   }
-
-  template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-  template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 };
 
 } // namespace serde
