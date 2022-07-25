@@ -118,12 +118,7 @@ void serde::deserialize(serde::Deserializer& de, types::Point& point)
   de.deserialize_struct_begin();
     de.deserialize_struct_field("x", point.x);
     de.deserialize_struct_field("y", point.y);
-    std::optional<types::Number> num;
-    de.deserialize_struct_field("num", num);
-    point.num = *num;
+    de.deserialize_struct_field("num", point.num);
   de.deserialize_struct_end();
-
-  std::variant<types::Number, int> var;
-  de.deserialize(var);
 }
 

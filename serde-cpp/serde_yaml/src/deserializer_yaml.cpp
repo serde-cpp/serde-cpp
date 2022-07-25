@@ -47,7 +47,7 @@ public:
     else if (curr.has_val()) {
       from_chars(curr.val(), &val); // TODO: check return
       //std::cout << "got val " << val << std::endl;
-      if (curr.parent_is_seq()) {
+      if (curr.has_parent() && curr.parent_is_seq()) {
         //std::cout << "next_sibling" << std::endl;
         curr = curr.next_sibling();
       }
@@ -155,7 +155,7 @@ public:
     }
     else if (curr.has_val()) {
       //std::cout << "got val " << val << std::endl;
-      if (curr.parent_is_seq()) {
+      if (curr.has_parent() && curr.parent_is_seq()) {
         //std::cout << "next_sibling" << std::endl;
         curr = curr.next_sibling();
       }
@@ -231,7 +231,7 @@ public:
 
   void deserialize_map_key_find(const char* key) final {
     auto curr = stack.top();
-    if (!curr.parent_is_map()) {
+    if (!curr.has_parent() || !curr.parent_is_map()) {
       std::cerr << "no map to find key" << std::endl;
       return;
     }

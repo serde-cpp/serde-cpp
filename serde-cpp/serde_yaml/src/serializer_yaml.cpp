@@ -39,7 +39,7 @@ public:
   }
 
   // Optional //////////////////////////////////////////////////////////////////
-  void serialize_none() final { }
+  void serialize_none() final { serialize_scalar("null"); }
 
   // Sequence //////////////////////////////////////////////////////////////////
   void serialize_seq_begin() final {
@@ -120,7 +120,7 @@ public:
     auto curr = stack.top();
     if (curr.is_seq())
       curr.append_child() << val;
-    else if (curr.parent_is_map()) {
+    else if (curr.has_parent() && curr.parent_is_map()) {
       curr.is_seed();
       if (!curr.has_key())
         curr << ryml::key(val);

@@ -83,3 +83,31 @@ TEST(Tuple, TestOne)
   EXPECT_EQ(tuple, de_tuple);
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// std::optional
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(Optional, Value)
+{
+  std::optional<types::Number> num = types::Number::Three;
+  auto str = serde_yaml::to_string(num).unwrap();
+  std::cout << str << std::endl;
+  EXPECT_STREQ(str.c_str(), "Three\n");
+
+  auto de_num = serde_yaml::from_str<std::optional<types::Number>>(std::move(str)).unwrap();
+  std::cout << (int)*de_num << std::endl;
+  EXPECT_EQ((int)*num, (int)*de_num);
+}
+
+TEST(Optional, Null)
+{
+  std::optional<types::Number> num = std::nullopt;
+  auto str = serde_yaml::to_string(num).unwrap();
+  std::cout << str << std::endl;
+  EXPECT_STREQ(str.c_str(), "null\n");
+
+  auto de_num = serde_yaml::from_str<std::optional<types::Number>>(std::move(str)).unwrap();
+  std::cout << (de_num ? 1 : 0) << std::endl;
+  EXPECT_FALSE(de_num.has_value());
+}
