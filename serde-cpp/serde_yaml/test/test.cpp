@@ -83,7 +83,6 @@ TEST(Tuple, TestOne)
   EXPECT_EQ(tuple, de_tuple);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // std::optional
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,24 +111,35 @@ TEST(Optional, Null)
   EXPECT_FALSE(de_num.has_value());
 }
 
-TEST(LocalType, One)
+///////////////////////////////////////////////////////////////////////////////
+// Local & Private scope types
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(LocalPrivateTypes, One)
 {
   struct Local {
+    Local() : line(0), scope{false} {}
     Local(int line) : line(line), scope{line ? true : false} {}
-
     void serialize(serde::Serializer& ser) const {
       ser.serialize_struct_begin();
       ser.serialize_struct_field("line", line);
       ser.serialize_struct_field("scope", scope);
       ser.serialize_struct_end();
     }
-
+    void deserialize(serde::Deserializer& de) {
+      de.deserialize_struct_begin();
+      de.deserialize_struct_field("line", line);
+      de.deserialize_struct_field("scope", scope);
+      de.deserialize_struct_end();
+    }
+    bool operator==(const Local& o) const { return std::tie(line, scope) == std::tie(o.line, o.scope); }
    private:
     struct Scope {
       bool closed;
       void serialize(serde::Serializer& ser) const { ser.serialize(closed); }
+      void deserialize(serde::Deserializer& de) { de.deserialize(closed); }
+      bool operator==(const Scope& o) const { return closed == o.closed; }
     };
-
     int line;
     Scope scope;
   };
@@ -139,4 +149,8 @@ TEST(LocalType, One)
   auto str = serde_yaml::to_string(local).unwrap();
   std::cout << str << std::endl;
   EXPECT_STREQ(str.c_str(), "line: 100\nscope: 1\n");
+
+  auto de_local = serde_yaml::from_str<Local>(std::move(str)).unwrap();
+  EXPECT_EQ(local, de_local);
 }
+

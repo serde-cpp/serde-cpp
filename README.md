@@ -21,7 +21,7 @@ Roadmap
   - [ ] toml
   - [ ] xml
 - [x] Deserialize complex types (template types)
-- [ ] Serde for local scope and private user types
+- [x] Serde for local scope and private user types
 - [x] Builtin std types serialization 
   - [x] string, string\_view
   - [x] vector, array

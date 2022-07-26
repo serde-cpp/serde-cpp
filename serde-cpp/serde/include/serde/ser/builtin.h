@@ -1,15 +1,10 @@
 #pragma once
 
+#include <cstdint>
 #include "serialize.h"
 #include "serializer.h"
 
 namespace serde {
-
-template<>
-inline void serialize(Serializer& ser, const bool& v)
-{
-  ser.serialize_bool(v);
-}
 
 namespace detail {
 template<typename T>
@@ -48,6 +43,12 @@ inline void serialize_unsigned_integer(Serializer& ser, const T& val) {
   }
 }
 } // namespace detail
+
+template<>
+inline void serialize(Serializer& ser, const bool& v)
+{
+  ser.serialize_bool(v);
+}
 
 template<>
 inline void serialize(Serializer& ser, const int& v)

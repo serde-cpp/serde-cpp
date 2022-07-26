@@ -1,15 +1,11 @@
 #pragma once
 
+#include <cstdint>
+#include <stdexcept>
 #include "deserialize.h"
 #include "deserializer.h"
 
 namespace serde {
-
-template<>
-inline void deserialize(Deserializer& de, bool& v)
-{
-  de.deserialize_bool(v);
-}
 
 namespace detail {
 template<typename T>
@@ -52,6 +48,12 @@ inline void deserialize_unsigned_integer(Deserializer& de, T& val) {
   }
 }
 } // namespace detail
+
+template<>
+inline void deserialize(Deserializer& de, bool& v)
+{
+  de.deserialize_bool(v);
+}
 
 template<>
 inline void deserialize(Deserializer& de, int& v)

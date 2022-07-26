@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../error.h"
-#include "../result.h"
+#include <cstdint>
 #include "serialize.h"
 #include "traits.h"
 

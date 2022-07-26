@@ -1,14 +1,18 @@
 #pragma once
 
-#include "../result.h"
+#include <cstdint>
 #include "deserialize.h"
+#include "traits.h"
 
 namespace serde {
 
 class Deserializer {
 public:
   template<typename T>
-  inline void deserialize(T& v) { serde::deserialize(*this, v); }
+  inline void deserialize(T& v) {
+    if constexpr (traits::HasMemberDeserialize<T>::value) v.deserialize(*this);
+    else serde::deserialize(*this, v);
+  }
 
   // Scalars ///////////////////////////////////////////////////////////////////
   virtual void deserialize_bool(bool&) = 0;
