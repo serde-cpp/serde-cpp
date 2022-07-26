@@ -5,6 +5,12 @@
 
 namespace serde {
 
+template<>
+inline void deserialize(Deserializer& de, bool& v)
+{
+  de.deserialize_bool(v);
+}
+
 namespace detail {
 template<typename T>
 inline void deserialize_signed_integer(Deserializer& de, T& val) {

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../result.h"
 #include "serialize.h"
 #include "serializer.h"
 
-#include <vector>
-#include <optional> // TODO: move to ./std/
-
 namespace serde {
 
-// Primitives /////////////////////////////////////////////////////////////////
+template<>
+inline void serialize(Serializer& ser, const bool& v)
+{
+  ser.serialize_bool(v);
+}
 
 namespace detail {
 template<typename T>

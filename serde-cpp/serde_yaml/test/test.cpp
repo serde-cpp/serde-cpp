@@ -115,13 +115,28 @@ TEST(Optional, Null)
 TEST(LocalType, One)
 {
   struct Local {
+    Local(int line) : line(line), scope{line ? true : false} {}
+
+    void serialize(serde::Serializer& ser) const {
+      ser.serialize_struct_begin();
+      ser.serialize_struct_field("line", line);
+      ser.serialize_struct_field("scope", scope);
+      ser.serialize_struct_end();
+    }
+
+   private:
+    struct Scope {
+      bool closed;
+      void serialize(serde::Serializer& ser) const { ser.serialize(closed); }
+    };
+
     int line;
-    void serialize(serde::Serializer& ser) const { ser.serialize(line); }
+    Scope scope;
   };
 
   Local local{100};
 
   auto str = serde_yaml::to_string(local).unwrap();
   std::cout << str << std::endl;
-  EXPECT_STREQ(str.c_str(), "100\n");
+  EXPECT_STREQ(str.c_str(), "line: 100\nscope: 1\n");
 }

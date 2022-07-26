@@ -23,11 +23,11 @@ Roadmap
 - [x] Deserialize complex types (template types)
 - [ ] Serde for local scope and private user types
 - [x] Builtin std types serialization 
-  - [ ] string, string\_view
+  - [x] string, string\_view
   - [x] vector, array
   - [x] map, unordered\_map
   - [x] set, unordered\_set
-  - [ ] tuple, pair
+  - [x] tuple, pair
   - [x] optional
   - [x] variant
 - [ ] Serde generation with attributes for user types
