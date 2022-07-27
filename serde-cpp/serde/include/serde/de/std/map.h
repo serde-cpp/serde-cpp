@@ -15,7 +15,7 @@ struct Deserialize<std::map> {
     map.clear();
     de.deserialize_map_begin();
     de.deserialize_map_size(size);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
       Key key; Value value;
       de.deserialize_map_entry(key, value);
       map.insert(std::move(key), std::move(value));
@@ -32,7 +32,7 @@ struct Deserialize<std::multimap> {
     multimap.clear();
     de.deserialize_map_begin();
     de.deserialize_map_size(size);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
       Key key; Value value;
       de.deserialize_map_entry(key, value);
       multimap.insert(std::move(key), std::move(value));

@@ -31,7 +31,7 @@ Roadmap
   - [x] optional
   - [x] variant
   - [x] multiset, multimap
-  - [ ] unordered\_multiset, unordered\_multimap
+  - [x] unordered\_multiset, unordered\_multimap
   - [ ] list, forward\_list
   - [ ] stack, deque, queue, priority\_queue
   - [ ] initializer\_list

@@ -32,7 +32,7 @@ struct Deserialize<std::multiset> {
     multiset.clear();
     de.deserialize_seq_begin();
     de.deserialize_seq_size(size);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
       Key key;
       de.deserialize(key);
       multiset.insert(std::move(key));
