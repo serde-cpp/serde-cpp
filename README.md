@@ -33,7 +33,7 @@ Roadmap
   - [x] multiset, multimap
   - [x] unordered\_multiset, unordered\_multimap
   - [x] list, forward\_list
-  - [ ] stack, deque, queue, priority\_queue
+  - [x] stack, deque, queue, priority\_queue
   - [ ] initializer\_list
   - [ ] any
 - [ ] Serde generation with attributes for user types

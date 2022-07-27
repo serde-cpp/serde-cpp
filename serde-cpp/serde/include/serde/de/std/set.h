@@ -15,7 +15,7 @@ struct Deserialize<std::set> {
     set.clear();
     de.deserialize_seq_begin();
     de.deserialize_seq_size(size);
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
       Key key;
       de.deserialize(key);
       set.insert(std::move(key));
