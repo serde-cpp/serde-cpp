@@ -24,5 +24,22 @@ struct Deserialize<std::map> {
   }
 };
 
+template<>
+struct Deserialize<std::multimap> {
+  template<typename Key, typename Value, typename... U>
+  static void deserialize(Deserializer& de, std::multimap<Key, Value, U...>& multimap) {
+    size_t size = 0;
+    multimap.clear();
+    de.deserialize_map_begin();
+    de.deserialize_map_size(size);
+    for (int i = 0; i < size; i++) {
+      Key key; Value value;
+      de.deserialize_map_entry(key, value);
+      multimap.insert(std::move(key), std::move(value));
+    }
+    de.deserialize_map_end();
+  }
+};
+
 } // namespace serde
 

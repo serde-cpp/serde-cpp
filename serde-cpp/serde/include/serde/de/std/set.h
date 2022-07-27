@@ -24,5 +24,22 @@ struct Deserialize<std::set> {
   }
 };
 
+template<>
+struct Deserialize<std::multiset> {
+  template<typename Key, typename... U>
+  static void deserialize(Deserializer& de, std::multiset<Key, U...>& multiset) {
+    size_t size = 0;
+    multiset.clear();
+    de.deserialize_seq_begin();
+    de.deserialize_seq_size(size);
+    for (int i = 0; i < size; i++) {
+      Key key;
+      de.deserialize(key);
+      multiset.insert(std::move(key));
+    }
+    de.deserialize_seq_end();
+  }
+};
+
 } // namespace serde
 
