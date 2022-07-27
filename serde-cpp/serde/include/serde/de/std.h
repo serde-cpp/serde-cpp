@@ -7,6 +7,8 @@
 #include "std/set.h"
 #include "std/unordered_map.h"
 #include "std/unordered_set.h"
+#include "std/list.h"
+#include "std/forward_list.h"
 #include "std/utility.h"
 #include "std/tuple.h"
 #include "std/variant.h"
