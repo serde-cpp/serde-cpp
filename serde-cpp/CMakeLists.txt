@@ -28,3 +28,4 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -Wall")
 add_subdirectory(serde)
 add_subdirectory(serde_yaml)
 
+add_subdirectory(serde_attr)

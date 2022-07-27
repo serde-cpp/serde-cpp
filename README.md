@@ -30,6 +30,12 @@ Roadmap
   - [x] tuple, pair
   - [x] optional
   - [x] variant
+  - [ ] multiset, multimap
+  - [ ] unordered\_multiset, unordered\_multimap
+  - [ ] list, forward\_list
+  - [ ] stack, deque, queue, priority\_queue
+  - [ ] initializer\_list
+  - [ ] any
 - [ ] Serde generation with attributes for user types
   - [ ] enum
   - [ ] struct (POD type)
