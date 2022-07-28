@@ -27,8 +27,9 @@ install(DIRECTORY include/serde_yaml DESTINATION include)
 #########################################################################################
 add_executable(serde_yaml_test)
 target_sources(serde_yaml_test PRIVATE
-  test/test.cpp
-  test/impl.cpp
+  test/main.cpp
+  test/std.cpp
+  test/types.cpp
 )
 target_include_directories(serde_yaml_test PRIVATE
   ${CMAKE_SOURCE_DIR}/include

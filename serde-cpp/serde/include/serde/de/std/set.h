@@ -13,8 +13,8 @@ struct Deserialize<std::set> {
   static void deserialize(Deserializer& de, std::set<Key, U...>& set) {
     size_t size = 0;
     set.clear();
-    de.deserialize_seq_begin();
     de.deserialize_seq_size(size);
+    de.deserialize_seq_begin();
     for (size_t i = 0; i < size; i++) {
       Key key;
       de.deserialize(key);
@@ -30,8 +30,8 @@ struct Deserialize<std::multiset> {
   static void deserialize(Deserializer& de, std::multiset<Key, U...>& multiset) {
     size_t size = 0;
     multiset.clear();
-    de.deserialize_seq_begin();
     de.deserialize_seq_size(size);
+    de.deserialize_seq_begin();
     for (size_t i = 0; i < size; i++) {
       Key key;
       de.deserialize(key);
