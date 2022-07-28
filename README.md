@@ -34,8 +34,7 @@ Roadmap
   - [x] unordered\_multiset, unordered\_multimap
   - [x] list, forward\_list
   - [x] stack, deque, queue, priority\_queue
-  - [ ] initializer\_list
-  - [ ] any
+  - [x] initializer\_list
 - [ ] Serde generation with attributes for user types
   - [ ] enum
   - [ ] struct (POD type)
