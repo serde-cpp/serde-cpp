@@ -18,7 +18,7 @@ struct Deserialize<std::set> {
     for (size_t i = 0; i < size; i++) {
       Key key;
       de.deserialize(key);
-      set.insert(std::move(key));
+      set.emplace(std::move(key));
     }
     de.deserialize_seq_end();
   }
@@ -35,7 +35,7 @@ struct Deserialize<std::multiset> {
     for (size_t i = 0; i < size; i++) {
       Key key;
       de.deserialize(key);
-      multiset.insert(std::move(key));
+      multiset.emplace(std::move(key));
     }
     de.deserialize_seq_end();
   }

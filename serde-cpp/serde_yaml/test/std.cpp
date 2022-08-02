@@ -138,6 +138,30 @@ TEST(Set, Empty)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// std::unordered_set
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(UnorderedSet, Simple)
+{
+  using Type = std::unordered_set<char>;
+  const Type val = {'w', 'o', 'r', 'l', 'd'};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "- d\n- l\n- r\n- o\n- w\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+TEST(UnorderedSet, Empty)
+{
+  using Type = std::unordered_set<char>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // std::map
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -154,6 +178,30 @@ TEST(Map, Simple)
 TEST(Map, Empty)
 {
   using Type = std::map<std::string, long int>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " {}\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::unordered_map
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(UnorderedMap, Simple)
+{
+  using Type = std::unordered_map<std::string, long int>;
+  const Type val = {{"foo", 10}, {"bar", 22}, {"egg", 67}};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "egg: 67\nbar: 22\nfoo: 10\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+TEST(UnorderedMap, Empty)
+{
+  using Type = std::unordered_map<std::string, long int>;
   const Type val = {};
   auto str = serde_yaml::to_string(val).unwrap();
   EXPECT_STREQ(str.c_str(), " {}\n");
