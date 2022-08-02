@@ -73,21 +73,41 @@ public:
 
   void deserialize_cstr(char* val, size_t len) final {
     auto& curr = stack.top();
-    if (!curr.has_val() || !curr.valid() || curr.is_seed()) {
-      std::cerr << "no value to extract" << std::endl;
+    if (!curr.valid() || curr.is_seed() || !curr.get()) {
+      std::cerr << "no scalar to extract" << std::endl;
       return; // TODO: mark error
     }
-    auto cstr = curr.val();
-    len = std::min(cstr.len + 1, len);
-    if (len) {
-      std::strncpy(val, cstr.data(), len);
-      val[len-1] = '\0';
-    }
 
-    //if (curr.parent_is_seq()) {
-      ////std::cout << "next_sibling" << std::endl;
-      //curr = curr.next_sibling();
-    //}
+    if (expect_key) {
+      if (curr.has_key()) {
+        auto cstr = curr.key();
+        len = std::min(cstr.len + 1, len);
+        if (len) {
+          std::strncpy(val, cstr.data(), len);
+          val[len-1] = '\0';
+        }
+        //std::cout << "got key " << val << std::endl;
+      }
+      else {
+        std::cerr << "no key to extract" << std::endl;
+      }
+    }
+    else if (curr.has_val()) {
+      auto cstr = curr.val();
+      len = std::min(cstr.len + 1, len);
+      if (len) {
+        std::strncpy(val, cstr.data(), len);
+        val[len-1] = '\0';
+      }
+      //std::cout << "got val " << val << std::endl;
+      if (curr.has_parent() && curr.parent_is_seq()) {
+        //std::cout << "next_sibling" << std::endl;
+        curr = curr.next_sibling();
+      }
+    }
+    else {
+      std::cerr << "no value to extract" << std::endl;
+    }
   }
   void deserialize_bytes(unsigned char* val, size_t len) final {
   }

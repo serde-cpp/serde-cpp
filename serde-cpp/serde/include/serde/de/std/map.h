@@ -13,12 +13,12 @@ struct Deserialize<std::map> {
   static void deserialize(Deserializer& de, std::map<Key, Value, U...>& map) {
     size_t size = 0;
     map.clear();
-    de.deserialize_map_begin();
     de.deserialize_map_size(size);
+    de.deserialize_map_begin();
     for (size_t i = 0; i < size; i++) {
       Key key; Value value;
       de.deserialize_map_entry(key, value);
-      map.insert(std::move(key), std::move(value));
+      map.emplace(std::move(key), std::move(value));
     }
     de.deserialize_map_end();
   }
@@ -30,12 +30,12 @@ struct Deserialize<std::multimap> {
   static void deserialize(Deserializer& de, std::multimap<Key, Value, U...>& multimap) {
     size_t size = 0;
     multimap.clear();
-    de.deserialize_map_begin();
     de.deserialize_map_size(size);
+    de.deserialize_map_begin();
     for (size_t i = 0; i < size; i++) {
       Key key; Value value;
       de.deserialize_map_entry(key, value);
-      multimap.insert(std::move(key), std::move(value));
+      multimap.emplace(std::move(key), std::move(value));
     }
     de.deserialize_map_end();
   }

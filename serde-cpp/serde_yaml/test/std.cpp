@@ -118,3 +118,45 @@ TEST(Set, TestOne)
   EXPECT_EQ(val, de_val);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// std::map
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(Map, TestOne)
+{
+  using Type = std::map<std::string, long int>;
+  const Type val = {{"foo", 10}, {"bar", 22}, {"egg", 67}};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "bar: 22\negg: 67\nfoo: 10\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::array
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(Array, TestOne)
+{
+  using Type = std::array<size_t, 6>;
+  const Type val = {56, 333, 1, 3, 49, 100};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "- 56\n- 333\n- 1\n- 3\n- 49\n- 100\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::vector
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(Vector, TestOne)
+{
+  using Type = std::vector<size_t>;
+  const Type val = {56, 333, 1, 3, 49, 100};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "- 56\n- 333\n- 1\n- 3\n- 49\n- 100\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
