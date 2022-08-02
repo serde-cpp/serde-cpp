@@ -1,14 +1,67 @@
 serde-cpp
 ===
 
+> Not ready yet !!
 > Currently in first stage of development !!
 > Open to contributions!
 
 Serialization framework for C++17, inspired on Rust's [serde](https://serde.rs/).
 
-**serde-cpp** ultimate goal is to generate serialization code for C++ data structures without MACROS,
-but rather with only valid C++17 syntax (using attributes), and along with that, serialize to
-any data format using a single serialization API, like serde does for Rust.
+**serde-cpp** ultimate goal is to make C++ data structures _automatically_ serializable without using MACROS,
+but rather with only valid C++17 syntax! That is, by using cpp's [[[_attributes_](https://en.cppreference.com/w/cpp/language/attributes)]],
+and provide a single API for serializing data types to any data format (yaml, json, toml, ...), like serde does for Rust.
+
+Example
+---
+
+```cpp
+struct [[serde]]
+Point {
+  int x;
+  int y;
+};
+
+int main() {
+  Point point{ 10, 20 };
+  std::string serialized = serde_yaml::to_string(point).unwrap();
+  std::cout << serialized << std::endl;
+  Point deserialized = serde_yaml::from_str("x: 10\ny: 20\n").unwrap();
+  assert(point.x == deserialized.x && point.y == deserialized.y);
+}
+```
+
+No macros, no duplicate description of the struct fields, nothing else.. only [[serde]] attribute needed.
+
+How we do it
+---
+
+**serde-cpp** generates serialization code for each header or translation unit passed to the serde generator binary.
+_serde_gen_ will scan the input file for types that have [[serde]] attributes applied and generate the serialization and deserialization code
+using serde-cpp's Serializer and Deserializer APIs.
+
+For the example above, the generated code would look like this:
+
+```cpp
+template<>
+void serde::serialize(serde::Serializer& ser, const Point& point)
+{
+  ser.serialize_struct_begin();
+    ser.serialize_struct_field("x", point.x);
+    ser.serialize_struct_field("y", point.y);
+  ser.serialize_struct_end();
+}
+
+template<>
+void serde::deserialize(serde::Deserializer& de, Point& point)
+{
+  de.deserialize_struct_begin();
+    de.deserialize_struct_field("x", point.x);
+    de.deserialize_struct_field("y", point.y);
+  de.deserialize_struct_end();
+}
+```
+
+More information will be provided here in the future.
 
 Roadmap
 ---
