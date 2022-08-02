@@ -13,8 +13,8 @@ struct Deserialize<std::stack> {
   static void deserialize(Deserializer& de, std::stack<T, U...>& stack) {
     while (!stack.empty()) stack.pop(); // clear stack
     size_t size = 0;
-    de.deserialize_seq_begin();
     de.deserialize_seq_size(size);
+    de.deserialize_seq_begin();
     for (size_t i = 0; i < size; i++) {
       T val;
       de.deserialize(val);

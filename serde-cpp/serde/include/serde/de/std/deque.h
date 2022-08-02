@@ -12,8 +12,8 @@ struct Deserialize<std::deque> {
   template<typename... U>
   static void deserialize(Deserializer& de, std::deque<U...>& deque) {
     size_t size = 0;
-    de.deserialize_seq_begin();
     de.deserialize_seq_size(size);
+    de.deserialize_seq_begin();
     deque.resize(size);
     for (auto& e : deque)
       de.deserialize(e);
