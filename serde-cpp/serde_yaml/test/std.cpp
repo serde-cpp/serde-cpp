@@ -10,11 +10,8 @@
 // std::variant
 ///////////////////////////////////////////////////////////////////////////////
 
-struct Variant : public ::testing::Test {
+TEST(Variant, Index0) {
   using Type = std::variant<char, int, std::string>;
-};
-
-TEST_F(Variant, Index0) {
   const Type val = 'c';
   auto str = serde_yaml::to_string(val).unwrap();
   EXPECT_STREQ(str.c_str(), "0: c\n");
@@ -22,7 +19,8 @@ TEST_F(Variant, Index0) {
   EXPECT_EQ(val, de_val);
 }
 
-TEST_F(Variant, Index1) {
+TEST(Variant, Index1) {
+  using Type = std::variant<char, int, std::string>;
   const Type val = 431;
   auto str = serde_yaml::to_string(val).unwrap();
   EXPECT_STREQ(str.c_str(), "1: 431\n");
@@ -30,7 +28,8 @@ TEST_F(Variant, Index1) {
   EXPECT_EQ(val, de_val);
 }
 
-TEST_F(Variant, Index2) {
+TEST(Variant, Index2) {
+  using Type = std::variant<char, int, std::string>;
   const Type val = "Hello World";
   auto str = serde_yaml::to_string(val).unwrap();
   EXPECT_STREQ(str.c_str(), "2: Hello World\n");
@@ -42,7 +41,7 @@ TEST_F(Variant, Index2) {
 // std::tuple
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Tuple, TestOne)
+TEST(Tuple, Simple)
 {
   using Type = std::tuple<char, int, std::string>;
   const Type val = {'z', 3467, "MyTuple"};
@@ -80,7 +79,7 @@ TEST(Optional, Null)
 // std::pair
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Pair, TestOne)
+TEST(Pair, Simple)
 {
   using Type = std::pair<int, std::string>;
   const Type val = {69, "sixty-nine"};
@@ -94,7 +93,7 @@ TEST(Pair, TestOne)
 // std::initializer_list
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(InitializerList, TestOne)
+TEST(InitializerList, Simple)
 {
   using Type = std::initializer_list<std::string>;
   const Type val = {"apple", "banana", "orange", "avocado", "blueberry"};
@@ -104,11 +103,21 @@ TEST(InitializerList, TestOne)
   static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::initializer_list>::deserialize<std::string>)>);
 }
 
+TEST(InitializerList, Empty)
+{
+  using Type = std::initializer_list<std::string>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  // no deserialization for initializer_list
+  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::initializer_list>::deserialize<std::string>)>);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // std::set
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Set, TestOne)
+TEST(Set, Simple)
 {
   using Type = std::set<char>;
   const Type val = {'w', 'o', 'r', 'l', 'd'};
@@ -118,11 +127,21 @@ TEST(Set, TestOne)
   EXPECT_EQ(val, de_val);
 }
 
+TEST(Set, Empty)
+{
+  using Type = std::set<char>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // std::map
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Map, TestOne)
+TEST(Map, Simple)
 {
   using Type = std::map<std::string, long int>;
   const Type val = {{"foo", 10}, {"bar", 22}, {"egg", 67}};
@@ -132,11 +151,21 @@ TEST(Map, TestOne)
   EXPECT_EQ(val, de_val);
 }
 
+TEST(Map, Empty)
+{
+  using Type = std::map<std::string, long int>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " {}\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // std::array
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Array, TestOne)
+TEST(Array, Simple)
 {
   using Type = std::array<size_t, 6>;
   const Type val = {56, 333, 1, 3, 49, 100};
@@ -146,16 +175,36 @@ TEST(Array, TestOne)
   EXPECT_EQ(val, de_val);
 }
 
+TEST(Array, Empty)
+{
+  using Type = std::array<size_t, 0>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // std::vector
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Vector, TestOne)
+TEST(Vector, Simple)
 {
   using Type = std::vector<size_t>;
   const Type val = {56, 333, 1, 3, 49, 100};
   auto str = serde_yaml::to_string(val).unwrap();
   EXPECT_STREQ(str.c_str(), "- 56\n- 333\n- 1\n- 3\n- 49\n- 100\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+TEST(Vector, Empty)
+{
+  using Type = std::vector<size_t>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " []\n");
   auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
   EXPECT_EQ(val, de_val);
 }

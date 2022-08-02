@@ -93,7 +93,7 @@ Roadmap
   - [ ] struct (POD type)
   - [ ] forward-declarations
   - [ ] foreign-types
-  - [ ] additional attributes (skip, rename, getter, setter, ...)
+  - [ ] additional attributes (skip, rename, getter, setter, flatten, skip\_none, default, ...)
 - [ ] Validate serde calls (seq/map utils) at interface level before impl (protected virtual)
 - [ ] Serde Union support
 - [ ] serde test suite

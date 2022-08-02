@@ -96,6 +96,11 @@ public:
     serialize_struct_field_end();
   }
 
+  // Flat //////////////////////////////////////////////////////////////////////
+  // template<typename T> void serialize_flat(const T& v);
+  // virtual void serialize_flat_begin() = 0;
+  // virtual void serialize_flat_end() = 0;
+
   // Destructor
   virtual ~Serializer() = default;
 };
