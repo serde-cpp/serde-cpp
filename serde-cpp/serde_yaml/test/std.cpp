@@ -162,6 +162,54 @@ TEST(UnorderedSet, Empty)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// std::multiset
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(MultiSet, Simple)
+{
+  using Type = std::multiset<char>;
+  const Type val = {'b', 'e', 'e', 'f'};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "- b\n- e\n- e\n- f\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+TEST(MultiSet, Empty)
+{
+  using Type = std::multiset<char>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::unordered_multiset
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(UnorderedMultiSet, Simple)
+{
+  using Type = std::unordered_multiset<char>;
+  const Type val = {'b', 'e', 'e', 'f'};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "- f\n- e\n- e\n- b\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+TEST(UnorderedMultiSet, Empty)
+{
+  using Type = std::unordered_multiset<char>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // std::map
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -202,6 +250,54 @@ TEST(UnorderedMap, Simple)
 TEST(UnorderedMap, Empty)
 {
   using Type = std::unordered_map<std::string, long int>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " {}\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::multimap
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(MultiMap, Simple)
+{
+  using Type = std::multimap<short int, std::string>;
+  const Type val = {{1, "one"}, {1, "uno"}, {2, "two"}};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "1: one\n1: uno\n2: two\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+TEST(MultiMap, Empty)
+{
+  using Type = std::multimap<std::string, long int>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), " {}\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::unordered_multimap
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(UnorderedMultiMap, Simple)
+{
+  using Type = std::unordered_multimap<short int, std::string>;
+  const Type val = {{1, "one"}, {1, "uno"}, {2, "two"}};
+  auto str = serde_yaml::to_string(val).unwrap();
+  EXPECT_STREQ(str.c_str(), "2: two\n1: uno\n1: one\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).unwrap();
+  EXPECT_EQ(val, de_val);
+}
+
+TEST(UnorderedMultiMap, Empty)
+{
+  using Type = std::unordered_multimap<std::string, long int>;
   const Type val = {};
   auto str = serde_yaml::to_string(val).unwrap();
   EXPECT_STREQ(str.c_str(), " {}\n");
