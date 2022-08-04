@@ -122,6 +122,14 @@ inline void deserialize(Deserializer& de, char& v)
 }
 
 template<>
+inline void deserialize(Deserializer& de, signed char& v)
+{
+  char c;
+  de.deserialize_char(c);
+  v = c;
+}
+
+template<>
 inline void deserialize(Deserializer& de, unsigned char& v)
 {
   de.deserialize_uchar(v);

@@ -23,9 +23,9 @@ Point {
 
 int main() {
   Point point{ 10, 20 };
-  std::string serialized = serde_yaml::to_string(point).unwrap();
+  std::string serialized = serde_yaml::to_string(point).value();
   std::cout << serialized << std::endl;
-  Point deserialized = serde_yaml::from_str("x: 10\ny: 20\n").unwrap();
+  Point deserialized = serde_yaml::from_str<Point>("x: 10\ny: 20\n").value();
   assert(point.x == deserialized.x && point.y == deserialized.y);
 }
 ```

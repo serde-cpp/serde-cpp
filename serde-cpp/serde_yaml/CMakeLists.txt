@@ -27,9 +27,10 @@ install(DIRECTORY include/serde_yaml DESTINATION include)
 #########################################################################################
 add_executable(serde_yaml_test)
 target_sources(serde_yaml_test PRIVATE
-  test/main.cpp
+  test/advanced.cpp
   test/std.cpp
   test/types.cpp
+  test/errors.cpp
   test/builtin.cpp
 )
 target_include_directories(serde_yaml_test PRIVATE

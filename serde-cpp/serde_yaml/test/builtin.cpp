@@ -7,7 +7,7 @@
 // Builtin types
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(BuiltinBool, True)
+TEST(Builtin, Bool_True)
 {
   bool val = true;
   auto str = serde_yaml::to_string(val).value();
@@ -16,7 +16,7 @@ TEST(BuiltinBool, True)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinBool, False)
+TEST(Builtin, Bool_False)
 {
   bool val = false;
   auto str = serde_yaml::to_string(val).value();
@@ -25,7 +25,7 @@ TEST(BuiltinBool, False)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinInt, Positive)
+TEST(Builtin, Int_Positive)
 {
   int val = 42631;
   auto str = serde_yaml::to_string(val).value();
@@ -34,7 +34,7 @@ TEST(BuiltinInt, Positive)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinInt, Negative)
+TEST(Builtin, Int_Negative)
 {
   int val = -42631;
   auto str = serde_yaml::to_string(val).value();
@@ -43,7 +43,7 @@ TEST(BuiltinInt, Negative)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinShortInt, Positive)
+TEST(Builtin, ShortInt_Positive)
 {
   short int val = 16535;
   auto str = serde_yaml::to_string(val).value();
@@ -52,7 +52,7 @@ TEST(BuiltinShortInt, Positive)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinShortInt, Negative)
+TEST(Builtin, ShortInt_Negative)
 {
   short int val = -16535;
   auto str = serde_yaml::to_string(val).value();
@@ -61,7 +61,7 @@ TEST(BuiltinShortInt, Negative)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinLongInt, Positive)
+TEST(Builtin, LongInt_Positive)
 {
   long int val = 98694223l;
   auto str = serde_yaml::to_string(val).value();
@@ -70,7 +70,7 @@ TEST(BuiltinLongInt, Positive)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinLongInt, Negative)
+TEST(Builtin, LongInt_Negative)
 {
   long int val = -98694223l;
   auto str = serde_yaml::to_string(val).value();
@@ -79,7 +79,7 @@ TEST(BuiltinLongInt, Negative)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinLongLongInt, Positive)
+TEST(Builtin, LongLongInt_Positive)
 {
   long long int val = 98694223111ll;
   auto str = serde_yaml::to_string(val).value();
@@ -88,7 +88,7 @@ TEST(BuiltinLongLongInt, Positive)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinLongLongInt, Negative)
+TEST(Builtin, LongLongInt_Negative)
 {
   long long int val = -98694223111ll;
   auto str = serde_yaml::to_string(val).value();
@@ -97,7 +97,7 @@ TEST(BuiltinLongLongInt, Negative)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinUnsignedInt, Value)
+TEST(Builtin, UnsignedInt)
 {
   unsigned int val = 42631u;
   auto str = serde_yaml::to_string(val).value();
@@ -106,7 +106,7 @@ TEST(BuiltinUnsignedInt, Value)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinUnsignedShortInt, Value)
+TEST(Builtin, UnsignedShortInt)
 {
   unsigned short int val = 16535u;
   auto str = serde_yaml::to_string(val).value();
@@ -115,7 +115,7 @@ TEST(BuiltinUnsignedShortInt, Value)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinUnsignedLongInt, Value)
+TEST(Builtin, UnsignedLongInt)
 {
   unsigned long int val = 98694223lu;
   auto str = serde_yaml::to_string(val).value();
@@ -124,7 +124,7 @@ TEST(BuiltinUnsignedLongInt, Value)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinUnsignedLongLongInt, Value)
+TEST(Builtin, UnsignedLongLongInt)
 {
   unsigned long long int val = 98694223111llu;
   auto str = serde_yaml::to_string(val).value();
@@ -133,7 +133,7 @@ TEST(BuiltinUnsignedLongLongInt, Value)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinFloat, Value)
+TEST(Builtin, Float)
 {
   float val = 3.14159f;
   auto str = serde_yaml::to_string(val).value();
@@ -142,7 +142,7 @@ TEST(BuiltinFloat, Value)
   EXPECT_FLOAT_EQ(de_val, val);
 }
 
-TEST(BuiltinDouble, Value)
+TEST(Builtin, Double)
 {
   double val = 3.14159;
   auto str = serde_yaml::to_string(val).value();
@@ -151,7 +151,7 @@ TEST(BuiltinDouble, Value)
   EXPECT_DOUBLE_EQ(de_val, val);
 }
 
-TEST(BuiltinChar, Value)
+TEST(Builtin, Char)
 {
   char val = 'A';
   auto str = serde_yaml::to_string(val).value();
@@ -160,7 +160,16 @@ TEST(BuiltinChar, Value)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinUnsignedChar, Value)
+TEST(Builtin, SignedChar)
+{
+  signed char val = 'B';
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "B\n");
+  auto de_val = serde_yaml::from_str<char>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+TEST(Builtin, UnsignedChar)
 {
   unsigned char val = 250;
   auto str = serde_yaml::to_string(val).value();
@@ -169,7 +178,7 @@ TEST(BuiltinUnsignedChar, Value)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(BuiltinConstCharPtr, Value)
+TEST(Builtin, ConstCharPtr)
 {
   const char* val = "FooBar";
   auto str = serde_yaml::to_string(val).value();
@@ -177,7 +186,7 @@ TEST(BuiltinConstCharPtr, Value)
   EXPECT_THROW(std::ignore = serde_yaml::from_str<const char*>(std::move(str)), std::logic_error);
 }
 
-TEST(BuiltinCharPtr, Value)
+TEST(Builtin, CharPtr)
 {
   char cstr[10] = "Wiggle";
   char* val = cstr;
@@ -186,7 +195,7 @@ TEST(BuiltinCharPtr, Value)
   EXPECT_THROW(std::ignore = serde_yaml::from_str<char*>(std::move(str)), std::logic_error);
 }
 
-TEST(BuiltinLiteralCharArray, Value)
+TEST(Builtin, LiteralCharArray)
 {
   struct Struct {
     char val[10] = "Wiggle";

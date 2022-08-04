@@ -117,6 +117,12 @@ inline void serialize(Serializer& ser, const char& v)
 }
 
 template<>
+inline void serialize(Serializer& ser, const signed char& v)
+{
+  ser.serialize_char(v);
+}
+
+template<>
 inline void serialize(Serializer& ser, const unsigned char& v)
 {
   ser.serialize_uchar(v);

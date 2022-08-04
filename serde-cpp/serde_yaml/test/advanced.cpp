@@ -7,13 +7,12 @@
 #include "types.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// General tests
+// Advanced tests
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Main, Serialize)
+TEST(Advanced, PointSerialize)
 {
-  types::Point point;
-  point.x = 10; point.y = 20;
+  types::Point point{ 10, 20 };
   std::string str = serde_yaml::to_string(point).value();
   std::cout << str << std::endl;
   EXPECT_STREQ(str.c_str(), R"(- - 10
@@ -42,7 +41,7 @@ TEST(Main, Serialize)
 }
 
 
-TEST(Main, Deserialize)
+TEST(Advanced, PointDeserialize)
 {
   using ::types::Point;
   Point point = serde_yaml::from_str<Point>("{x: 0x10, y: 0x20, num: Three}").value();
@@ -53,11 +52,11 @@ TEST(Main, Deserialize)
 // Local & Private scope types
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(LocalPrivateTypes, One)
+TEST(Advanced, LocalPrivateTypes)
 {
   struct Local {
     Local() : line(0), scope{false} {}
-    Local(int line) : line(line), scope{line ? true : false} {}
+    Local(int line) : line(line), scope{line != 0} {}
     void serialize(serde::Serializer& ser) const {
       ser.serialize_struct_begin();
       ser.serialize_struct_field("line", line);
