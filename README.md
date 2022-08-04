@@ -88,6 +88,8 @@ Roadmap
   - [x] list, forward\_list
   - [x] stack, deque, queue, priority\_queue
   - [x] initializer\_list
+- [x] Test std types serialization
+- [ ] Proper parsing/emitting error return
 - [ ] Serde generation with attributes for user types
   - [ ] enum
   - [ ] struct (POD type)

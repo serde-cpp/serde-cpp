@@ -7,6 +7,174 @@
 #include "types.h"
 
 ///////////////////////////////////////////////////////////////////////////////
+// std::string
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(String, Simple)
+{
+  using Type = std::string;
+  const Type val = "Hello World";
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "Hello World\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+TEST(String, Empty)
+{
+  using Type = std::string;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::string_view
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(StringView, Simple)
+{
+  using Type = std::string_view;
+  const Type val = "Hello World";
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "Hello World\n");
+  // no deserialization for string_view
+  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
+}
+
+TEST(StringView, Empty)
+{
+  using Type = std::string_view;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "\n");
+  // no deserialization for string_view
+  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::unique_ptr
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(UniquePtr, Simple)
+{
+  using Type = std::unique_ptr<std::string>;
+  const Type val = std::make_unique<std::string>("Potatos");
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "Potatos\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(*de_val, *val);
+}
+
+TEST(UniquePtr, Empty)
+{
+  using Type = std::unique_ptr<std::string>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "null\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::shared_ptr
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(SharedPtr, Simple)
+{
+  using Type = std::shared_ptr<std::string>;
+  const Type val = std::make_shared<std::string>("Bananas");
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "Bananas\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(*de_val, *val);
+}
+
+TEST(SharedPtr, Empty)
+{
+  using Type = std::shared_ptr<std::string>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "null\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::optional
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(Optional, Value)
+{
+  using Type = std::optional<types::Number>;
+  const Type val = types::Number::Three;
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "Three\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ((int)*val, (int)*de_val);
+}
+
+TEST(Optional, Null)
+{
+  using Type = std::optional<types::Number>;
+  const Type val = std::nullopt;
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "null\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_FALSE(de_val.has_value());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::array
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(Array, Simple)
+{
+  using Type = std::array<size_t, 6>;
+  const Type val = {56, 333, 1, 3, 49, 100};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "- 56\n- 333\n- 1\n- 3\n- 49\n- 100\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+TEST(Array, Empty)
+{
+  using Type = std::array<size_t, 0>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::vector
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(Vector, Simple)
+{
+  using Type = std::vector<size_t>;
+  const Type val = {56, 333, 1, 3, 49, 100};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "- 56\n- 333\n- 1\n- 3\n- 49\n- 100\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+TEST(Vector, Empty)
+{
+  using Type = std::vector<size_t>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // std::variant
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -52,30 +220,6 @@ TEST(Tuple, Simple)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// std::optional
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(Optional, Value)
-{
-  using Type = std::optional<types::Number>;
-  const Type val = types::Number::Three;
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "Three\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ((int)*val, (int)*de_val);
-}
-
-TEST(Optional, Null)
-{
-  using Type = std::optional<types::Number>;
-  const Type val = std::nullopt;
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "null\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_FALSE(de_val.has_value());
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // std::pair
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -111,6 +255,54 @@ TEST(InitializerList, Empty)
   EXPECT_STREQ(str.c_str(), " []\n");
   // no deserialization for initializer_list
   static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::initializer_list>::deserialize<std::string>)>);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::list
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(List, Simple)
+{
+  using Type = std::list<int>;
+  const Type val = {7, 9, 4, -1};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "- 7\n- 9\n- 4\n- -1\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+TEST(List, Empty)
+{
+  using Type = std::list<int>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// std::forward_list
+///////////////////////////////////////////////////////////////////////////////
+
+TEST(ForwardList, Simple)
+{
+  using Type = std::forward_list<int>;
+  const Type val = {7, 9, 4, -1};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "- 7\n- 9\n- 4\n- -1\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
+}
+
+TEST(ForwardList, Empty)
+{
+  using Type = std::forward_list<int>;
+  const Type val = {};
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), " []\n");
+  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
+  EXPECT_EQ(de_val, val);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -306,54 +498,6 @@ TEST(UnorderedMultiMap, Empty)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// std::array
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(Array, Simple)
-{
-  using Type = std::array<size_t, 6>;
-  const Type val = {56, 333, 1, 3, 49, 100};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "- 56\n- 333\n- 1\n- 3\n- 49\n- 100\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-TEST(Array, Empty)
-{
-  using Type = std::array<size_t, 0>;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), " []\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// std::vector
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(Vector, Simple)
-{
-  using Type = std::vector<size_t>;
-  const Type val = {56, 333, 1, 3, 49, 100};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "- 56\n- 333\n- 1\n- 3\n- 49\n- 100\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-TEST(Vector, Empty)
-{
-  using Type = std::vector<size_t>;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), " []\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // std::deque
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -425,150 +569,6 @@ TEST(Stack, Empty)
   std::string str = " []\n";
   // no serialization for stack
   static_assert(!std::is_member_function_pointer_v<decltype(&serde::Serialize<std::stack>::serialize<std::string>)>);
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// std::list
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(List, Simple)
-{
-  using Type = std::list<int>;
-  const Type val = {7, 9, 4, -1};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "- 7\n- 9\n- 4\n- -1\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-TEST(List, Empty)
-{
-  using Type = std::list<int>;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), " []\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// std::forward_list
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(ForwardList, Simple)
-{
-  using Type = std::forward_list<int>;
-  const Type val = {7, 9, 4, -1};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "- 7\n- 9\n- 4\n- -1\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-TEST(ForwardList, Empty)
-{
-  using Type = std::forward_list<int>;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), " []\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// std::string
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(String, Simple)
-{
-  using Type = std::string;
-  const Type val = "Hello World";
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "Hello World\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-TEST(String, Empty)
-{
-  using Type = std::string;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// std::string_view
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(StringView, Simple)
-{
-  using Type = std::string_view;
-  const Type val = "Hello World";
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "Hello World\n");
-  // no deserialization for string_view
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
-}
-
-TEST(StringView, Empty)
-{
-  using Type = std::string_view;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "\n");
-  // no deserialization for string_view
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// std::shared_ptr
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(SharedPtr, Simple)
-{
-  using Type = std::shared_ptr<std::string>;
-  const Type val = std::make_shared<std::string>("Bananas");
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "Bananas\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(*de_val, *val);
-}
-
-TEST(SharedPtr, Empty)
-{
-  using Type = std::shared_ptr<std::string>;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "null\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(de_val, val);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// std::unique_ptr
-///////////////////////////////////////////////////////////////////////////////
-
-TEST(UniquePtr, Simple)
-{
-  using Type = std::unique_ptr<std::string>;
-  const Type val = std::make_unique<std::string>("Potatos");
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "Potatos\n");
-  auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
-  EXPECT_EQ(*de_val, *val);
-}
-
-TEST(UniquePtr, Empty)
-{
-  using Type = std::unique_ptr<std::string>;
-  const Type val = {};
-  auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "null\n");
   auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
   EXPECT_EQ(de_val, val);
 }
