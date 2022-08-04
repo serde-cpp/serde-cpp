@@ -12,8 +12,8 @@ struct Deserialize<std::list> {
   template<typename... U>
   static void deserialize(Deserializer& de, std::list<U...>& list) {
     size_t size = 0;
-    de.deserialize_seq_begin();
     de.deserialize_seq_size(size);
+    de.deserialize_seq_begin();
     list.resize(size);
     for (auto& e : list)
       de.deserialize(e);

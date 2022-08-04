@@ -6,15 +6,15 @@ set(CPPAST_BUILD_TOOL ON) # fetches cxxopts
 add_subdirectory(cppast)
 
 #########################################################################################
-# serde_attr
+# serde_gen
 #########################################################################################
-add_executable(serde_attr src/main.cpp)
-target_link_libraries(serde_attr PRIVATE
+add_executable(serde_gen src/main.cpp)
+target_link_libraries(serde_gen PRIVATE
   serde
   cppast
   cxxopts
 )
-install(TARGETS serde_attr)
+install(TARGETS serde_gen)
 
 #########################################################################################
 # Tests

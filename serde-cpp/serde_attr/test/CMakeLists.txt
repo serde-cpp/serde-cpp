@@ -4,11 +4,11 @@
 
 add_custom_command(
   OUTPUT test_serde.cpp
-  COMMAND ${CMAKE_BINARY_DIR}/serde_attr/serde_attr
+  COMMAND ${CMAKE_BINARY_DIR}/serde_attr/serde_gen
           -I ${CMAKE_SOURCE_DIR}/serde/include
           -I ${CMAKE_SOURCE_DIR}/serde_yaml/include
           ${CMAKE_CURRENT_SOURCE_DIR}/test.cpp
-  DEPENDS ${CMAKE_BINARY_DIR}/serde_attr/serde_attr
+  DEPENDS serde_gen
 )
 
 add_executable(serde_attr_test)

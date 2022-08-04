@@ -19,7 +19,7 @@ auto from_str(std::string&& str) -> Result<T, serde::Error>
   detail::DeserializerParse(de.get());
   T obj{};
   de->deserialize(obj);
-  return Ok(obj);
+  return Ok(std::move(obj));
 }
 
 } // namespace serde_yaml

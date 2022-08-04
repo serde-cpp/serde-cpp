@@ -106,7 +106,9 @@ public:
       }
     }
     else {
-      std::cerr << "no value to extract" << std::endl;
+      //std::cerr << "no value to extract" << std::endl;
+      if (len)
+        *val = '\0';
     }
   }
   void deserialize_bytes(unsigned char* val, size_t len) final {
@@ -131,7 +133,8 @@ public:
       len = curr.val().len;
     }
     else {
-      std::cerr << "no value to check length" << std::endl;
+      //std::cerr << "no value to check length" << std::endl;
+      len = 0;
     }
   }
 
