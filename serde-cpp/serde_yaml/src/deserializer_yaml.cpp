@@ -68,8 +68,8 @@ public:
   void deserialize_u32(uint32_t& val) final { deserialize_scalar(val); }
   void deserialize_i64(int64_t& val) final { deserialize_scalar(val); }
   void deserialize_u64(uint64_t& val) final { deserialize_scalar(val); }
-  void deserialize_float(float&) final { }
-  void deserialize_double(double&) final { }
+  void deserialize_float(float& val) final { deserialize_scalar(val); }
+  void deserialize_double(double& val) final { deserialize_scalar(val); }
   void deserialize_char(char& val) final { deserialize_scalar(val); }
   void deserialize_uchar(unsigned char& val) final { deserialize_scalar(val); }
 

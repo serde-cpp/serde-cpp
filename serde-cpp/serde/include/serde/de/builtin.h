@@ -133,6 +133,12 @@ inline void deserialize(Deserializer& de, char* & cstr)
   throw std::logic_error("Cannot deserialize to char*, length is unknown. Use char[N] or std::string");
 }
 
+template<>
+inline void deserialize(Deserializer& de, const char* & cstr)
+{
+  throw std::logic_error("Cannot deserialize to const char*, it is const and length is unknown. Use char[N] or std::string");
+}
+
 template<size_t N>
 inline void deserialize(class Deserializer& de, char (&val)[N])
 {

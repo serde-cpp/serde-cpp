@@ -30,6 +30,7 @@ target_sources(serde_yaml_test PRIVATE
   test/main.cpp
   test/std.cpp
   test/types.cpp
+  test/builtin.cpp
 )
 target_include_directories(serde_yaml_test PRIVATE
   ${CMAKE_SOURCE_DIR}/include

@@ -89,13 +89,14 @@ Roadmap
   - [x] stack, deque, queue, priority\_queue
   - [x] initializer\_list
 - [x] Test std types serialization
+- [x] Test builtin types serialization
 - [ ] Proper parsing/emitting error return
 - [ ] Serde generation with attributes for user types
   - [ ] enum
   - [ ] struct (POD type)
   - [ ] forward-declarations
   - [ ] foreign-types
-  - [ ] additional attributes (skip, rename, getter, setter, flatten, skip\_none, default, ...)
+  - [ ] additional attributes (skip, skip\_de, skip\_ser, rename, getter, setter, flatten, skip\_none, default, ...)
 - [ ] Validate serde calls (seq/map utils) at interface level before impl (protected virtual)
 - [ ] Serde Union support
 - [ ] Support non-default constructable types

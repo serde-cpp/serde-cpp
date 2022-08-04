@@ -123,6 +123,12 @@ inline void serialize(Serializer& ser, const unsigned char& v)
 }
 
 template<>
+inline void serialize(Serializer& ser, char* const& val)
+{
+  ser.serialize_cstr(val);
+}
+
+template<>
 inline void serialize(Serializer& ser, const char* const& val)
 {
   ser.serialize_cstr(val);

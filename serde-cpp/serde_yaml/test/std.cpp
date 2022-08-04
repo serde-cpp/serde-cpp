@@ -10,7 +10,7 @@
 // std::string
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(String, Simple)
+TEST(StdString, Simple)
 {
   using Type = std::string;
   const Type val = "Hello World";
@@ -20,7 +20,7 @@ TEST(String, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(String, Empty)
+TEST(StdString, Empty)
 {
   using Type = std::string;
   const Type val = {};
@@ -34,7 +34,7 @@ TEST(String, Empty)
 // std::string_view
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(StringView, Simple)
+TEST(StdStringView, Simple)
 {
   using Type = std::string_view;
   const Type val = "Hello World";
@@ -44,7 +44,7 @@ TEST(StringView, Simple)
   static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
 }
 
-TEST(StringView, Empty)
+TEST(StdStringView, Empty)
 {
   using Type = std::string_view;
   const Type val = {};
@@ -58,7 +58,7 @@ TEST(StringView, Empty)
 // std::unique_ptr
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(UniquePtr, Simple)
+TEST(StdUniquePtr, Simple)
 {
   using Type = std::unique_ptr<std::string>;
   const Type val = std::make_unique<std::string>("Potatos");
@@ -68,7 +68,7 @@ TEST(UniquePtr, Simple)
   EXPECT_EQ(*de_val, *val);
 }
 
-TEST(UniquePtr, Empty)
+TEST(StdUniquePtr, Empty)
 {
   using Type = std::unique_ptr<std::string>;
   const Type val = {};
@@ -82,7 +82,7 @@ TEST(UniquePtr, Empty)
 // std::shared_ptr
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(SharedPtr, Simple)
+TEST(StdSharedPtr, Simple)
 {
   using Type = std::shared_ptr<std::string>;
   const Type val = std::make_shared<std::string>("Bananas");
@@ -92,7 +92,7 @@ TEST(SharedPtr, Simple)
   EXPECT_EQ(*de_val, *val);
 }
 
-TEST(SharedPtr, Empty)
+TEST(StdSharedPtr, Empty)
 {
   using Type = std::shared_ptr<std::string>;
   const Type val = {};
@@ -106,7 +106,7 @@ TEST(SharedPtr, Empty)
 // std::optional
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Optional, Value)
+TEST(StdOptional, Value)
 {
   using Type = std::optional<types::Number>;
   const Type val = types::Number::Three;
@@ -116,7 +116,7 @@ TEST(Optional, Value)
   EXPECT_EQ((int)*val, (int)*de_val);
 }
 
-TEST(Optional, Null)
+TEST(StdOptional, Null)
 {
   using Type = std::optional<types::Number>;
   const Type val = std::nullopt;
@@ -130,7 +130,7 @@ TEST(Optional, Null)
 // std::array
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Array, Simple)
+TEST(StdArray, Simple)
 {
   using Type = std::array<size_t, 6>;
   const Type val = {56, 333, 1, 3, 49, 100};
@@ -140,7 +140,7 @@ TEST(Array, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Array, Empty)
+TEST(StdArray, Empty)
 {
   using Type = std::array<size_t, 0>;
   const Type val = {};
@@ -154,7 +154,7 @@ TEST(Array, Empty)
 // std::vector
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Vector, Simple)
+TEST(StdVector, Simple)
 {
   using Type = std::vector<size_t>;
   const Type val = {56, 333, 1, 3, 49, 100};
@@ -164,7 +164,7 @@ TEST(Vector, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Vector, Empty)
+TEST(StdVector, Empty)
 {
   using Type = std::vector<size_t>;
   const Type val = {};
@@ -178,7 +178,7 @@ TEST(Vector, Empty)
 // std::variant
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Variant, Index0) {
+TEST(StdVariant, Index0) {
   using Type = std::variant<char, int, std::string>;
   const Type val = 'c';
   auto str = serde_yaml::to_string(val).value();
@@ -187,7 +187,7 @@ TEST(Variant, Index0) {
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Variant, Index1) {
+TEST(StdVariant, Index1) {
   using Type = std::variant<char, int, std::string>;
   const Type val = 431;
   auto str = serde_yaml::to_string(val).value();
@@ -196,7 +196,7 @@ TEST(Variant, Index1) {
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Variant, Index2) {
+TEST(StdVariant, Index2) {
   using Type = std::variant<char, int, std::string>;
   const Type val = "Hello World";
   auto str = serde_yaml::to_string(val).value();
@@ -209,7 +209,7 @@ TEST(Variant, Index2) {
 // std::tuple
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Tuple, Simple)
+TEST(StdTuple, Simple)
 {
   using Type = std::tuple<char, int, std::string>;
   const Type val = {'z', 3467, "MyTuple"};
@@ -223,7 +223,7 @@ TEST(Tuple, Simple)
 // std::pair
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Pair, Simple)
+TEST(StdPair, Simple)
 {
   using Type = std::pair<int, std::string>;
   const Type val = {69, "sixty-nine"};
@@ -237,7 +237,7 @@ TEST(Pair, Simple)
 // std::initializer_list
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(InitializerList, Simple)
+TEST(StdInitializerList, Simple)
 {
   using Type = std::initializer_list<std::string>;
   const Type val = {"apple", "banana", "orange", "avocado", "blueberry"};
@@ -247,7 +247,7 @@ TEST(InitializerList, Simple)
   static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::initializer_list>::deserialize<std::string>)>);
 }
 
-TEST(InitializerList, Empty)
+TEST(StdInitializerList, Empty)
 {
   using Type = std::initializer_list<std::string>;
   const Type val = {};
@@ -261,7 +261,7 @@ TEST(InitializerList, Empty)
 // std::list
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(List, Simple)
+TEST(StdList, Simple)
 {
   using Type = std::list<int>;
   const Type val = {7, 9, 4, -1};
@@ -271,7 +271,7 @@ TEST(List, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(List, Empty)
+TEST(StdList, Empty)
 {
   using Type = std::list<int>;
   const Type val = {};
@@ -285,7 +285,7 @@ TEST(List, Empty)
 // std::forward_list
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(ForwardList, Simple)
+TEST(StdForwardList, Simple)
 {
   using Type = std::forward_list<int>;
   const Type val = {7, 9, 4, -1};
@@ -295,7 +295,7 @@ TEST(ForwardList, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(ForwardList, Empty)
+TEST(StdForwardList, Empty)
 {
   using Type = std::forward_list<int>;
   const Type val = {};
@@ -309,7 +309,7 @@ TEST(ForwardList, Empty)
 // std::set
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Set, Simple)
+TEST(StdSet, Simple)
 {
   using Type = std::set<char>;
   const Type val = {'w', 'o', 'r', 'l', 'd'};
@@ -319,7 +319,7 @@ TEST(Set, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Set, Empty)
+TEST(StdSet, Empty)
 {
   using Type = std::set<char>;
   const Type val = {};
@@ -333,7 +333,7 @@ TEST(Set, Empty)
 // std::unordered_set
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(UnorderedSet, Simple)
+TEST(StdUnorderedSet, Simple)
 {
   using Type = std::unordered_set<char>;
   const Type val = {'w', 'o', 'r', 'l', 'd'};
@@ -343,7 +343,7 @@ TEST(UnorderedSet, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(UnorderedSet, Empty)
+TEST(StdUnorderedSet, Empty)
 {
   using Type = std::unordered_set<char>;
   const Type val = {};
@@ -357,7 +357,7 @@ TEST(UnorderedSet, Empty)
 // std::multiset
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(MultiSet, Simple)
+TEST(StdMultiSet, Simple)
 {
   using Type = std::multiset<char>;
   const Type val = {'b', 'e', 'e', 'f'};
@@ -367,7 +367,7 @@ TEST(MultiSet, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(MultiSet, Empty)
+TEST(StdMultiSet, Empty)
 {
   using Type = std::multiset<char>;
   const Type val = {};
@@ -381,7 +381,7 @@ TEST(MultiSet, Empty)
 // std::unordered_multiset
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(UnorderedMultiSet, Simple)
+TEST(StdUnorderedMultiSet, Simple)
 {
   using Type = std::unordered_multiset<char>;
   const Type val = {'b', 'e', 'e', 'f'};
@@ -391,7 +391,7 @@ TEST(UnorderedMultiSet, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(UnorderedMultiSet, Empty)
+TEST(StdUnorderedMultiSet, Empty)
 {
   using Type = std::unordered_multiset<char>;
   const Type val = {};
@@ -405,7 +405,7 @@ TEST(UnorderedMultiSet, Empty)
 // std::map
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Map, Simple)
+TEST(StdMap, Simple)
 {
   using Type = std::map<std::string, long int>;
   const Type val = {{"foo", 10}, {"bar", 22}, {"egg", 67}};
@@ -415,7 +415,7 @@ TEST(Map, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Map, Empty)
+TEST(StdMap, Empty)
 {
   using Type = std::map<std::string, long int>;
   const Type val = {};
@@ -429,7 +429,7 @@ TEST(Map, Empty)
 // std::unordered_map
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(UnorderedMap, Simple)
+TEST(StdUnorderedMap, Simple)
 {
   using Type = std::unordered_map<std::string, long int>;
   const Type val = {{"foo", 10}, {"bar", 22}, {"egg", 67}};
@@ -439,7 +439,7 @@ TEST(UnorderedMap, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(UnorderedMap, Empty)
+TEST(StdUnorderedMap, Empty)
 {
   using Type = std::unordered_map<std::string, long int>;
   const Type val = {};
@@ -453,7 +453,7 @@ TEST(UnorderedMap, Empty)
 // std::multimap
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(MultiMap, Simple)
+TEST(StdMultiMap, Simple)
 {
   using Type = std::multimap<short int, std::string>;
   const Type val = {{1, "one"}, {1, "uno"}, {2, "two"}};
@@ -463,7 +463,7 @@ TEST(MultiMap, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(MultiMap, Empty)
+TEST(StdMultiMap, Empty)
 {
   using Type = std::multimap<std::string, long int>;
   const Type val = {};
@@ -477,7 +477,7 @@ TEST(MultiMap, Empty)
 // std::unordered_multimap
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(UnorderedMultiMap, Simple)
+TEST(StdUnorderedMultiMap, Simple)
 {
   using Type = std::unordered_multimap<short int, std::string>;
   const Type val = {{1, "one"}, {1, "uno"}, {2, "two"}};
@@ -487,7 +487,7 @@ TEST(UnorderedMultiMap, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(UnorderedMultiMap, Empty)
+TEST(StdUnorderedMultiMap, Empty)
 {
   using Type = std::unordered_multimap<std::string, long int>;
   const Type val = {};
@@ -501,7 +501,7 @@ TEST(UnorderedMultiMap, Empty)
 // std::deque
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Deque, Simple)
+TEST(StdDeque, Simple)
 {
   using Type = std::deque<std::string>;
   const Type val = {"clubs", "queen", "king"};
@@ -511,7 +511,7 @@ TEST(Deque, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Deque, Empty)
+TEST(StdDeque, Empty)
 {
   using Type = std::deque<std::string>;
   const Type val = {};
@@ -525,7 +525,7 @@ TEST(Deque, Empty)
 // std::queue
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Queue, Simple)
+TEST(StdQueue, Simple)
 {
   using Type = std::queue<std::string>;
   Type val; val.push("clubs"); val.push("queen"); val.push("king");
@@ -536,7 +536,7 @@ TEST(Queue, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Queue, Empty)
+TEST(StdQueue, Empty)
 {
   using Type = std::queue<std::string>;
   Type val;
@@ -551,7 +551,7 @@ TEST(Queue, Empty)
 // std::stack
 ///////////////////////////////////////////////////////////////////////////////
 
-TEST(Stack, Simple)
+TEST(StdStack, Simple)
 {
   using Type = std::stack<std::string>;
   Type val; val.push("clubs"); val.push("queen"); val.push("king");
@@ -562,7 +562,7 @@ TEST(Stack, Simple)
   EXPECT_EQ(de_val, val);
 }
 
-TEST(Stack, Empty)
+TEST(StdStack, Empty)
 {
   using Type = std::stack<std::string>;
   Type val;
