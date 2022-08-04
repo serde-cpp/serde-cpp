@@ -13,7 +13,7 @@ struct [[serde]] Options
 int main()
 {
   Options opts{true, 856, "main"};
-  auto str = serde_yaml::to_string(opts).unwrap();
+  auto str = serde_yaml::to_string(opts).value();
   std::cout << str << std::endl;
   return 0;
 }

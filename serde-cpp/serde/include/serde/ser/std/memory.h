@@ -9,8 +9,8 @@ namespace serde {
 
 template<>
 struct Serialize<std::unique_ptr> {
-  template<typename T>
-  static void serialize(Serializer& ser, const std::unique_ptr<T>& val) {
+  template<typename T, typename Deleter>
+  static void serialize(Serializer& ser, const std::unique_ptr<T, Deleter>& val) {
     if (val)
       ser.serialize(*val);
     else

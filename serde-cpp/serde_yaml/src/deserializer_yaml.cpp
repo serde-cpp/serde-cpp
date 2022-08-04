@@ -2,6 +2,8 @@
 
 #include <stack>
 #include <cstring>
+#include <iostream>
+
 #include <ryml_std.hpp>
 #include <ryml.hpp>
 #include <c4/format.hpp>
@@ -306,11 +308,11 @@ auto DeserializerNew(std::string&& str) -> std::unique_ptr<serde::Deserializer>
   return std::make_unique<YamlDeserializer>(std::move(str));
 }
 
-auto DeserializerParse(serde::Deserializer* de) -> Result<void, serde::Error>
+auto DeserializerParse(serde::Deserializer* de) -> cpp::result<void, serde::Error>
 {
   auto yamlde = static_cast<YamlDeserializer*>(de);
   yamlde->parse();
-  return Ok();
+  return {};
 }
 
 } // namespace detail

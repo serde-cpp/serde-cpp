@@ -3,7 +3,7 @@
 #include <string>
 #include <serde/ser.h>
 #include <serde/error.h>
-#include <serde/result.h>
+#include <serde/result.hpp>
 
 #include "detail/ser_detail.h"
 
@@ -14,7 +14,7 @@ namespace serde_yaml {
 
 /// YAML Serializer function from T to yaml string
 template<typename T>
-auto to_string(T&& obj) -> Result<std::string, serde::Error>
+auto to_string(T&& obj) -> cpp::result<std::string, serde::Error>
 {
   auto ser = detail::SerializerNew();
   ser->serialize(std::forward<T>(obj));

@@ -14,7 +14,7 @@ TEST(Main, Serialize)
 {
   types::Point point;
   point.x = 10; point.y = 20;
-  std::string str = serde_yaml::to_string(point).unwrap();
+  std::string str = serde_yaml::to_string(point).value();
   std::cout << str << std::endl;
   EXPECT_STREQ(str.c_str(), R"(- - 10
   - 20
@@ -45,7 +45,7 @@ TEST(Main, Serialize)
 TEST(Main, Deserialize)
 {
   using ::types::Point;
-  Point point = serde_yaml::from_str<Point>("{x: 0x10, y: 0x20, num: Three}").unwrap();
+  Point point = serde_yaml::from_str<Point>("{x: 0x10, y: 0x20, num: Three}").value();
   std::cout << "point: " << point.x << " " << point.y << " " << (int)point.num << std::endl;
 }
 
@@ -84,11 +84,11 @@ TEST(LocalPrivateTypes, One)
 
   Local local{100};
 
-  auto str = serde_yaml::to_string(local).unwrap();
+  auto str = serde_yaml::to_string(local).value();
   std::cout << str << std::endl;
   EXPECT_STREQ(str.c_str(), "line: 100\nscope: 1\n");
 
-  auto de_local = serde_yaml::from_str<Local>(std::move(str)).unwrap();
+  auto de_local = serde_yaml::from_str<Local>(std::move(str)).value();
   EXPECT_EQ(local, de_local);
 }
 

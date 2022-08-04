@@ -1,6 +1,8 @@
 #include "serde_yaml/ser_yaml.h"
 
 #include <stack>
+#include <iostream>
+
 #include <ryml_std.hpp>
 #include <ryml.hpp>
 #include <c4/format.hpp>
@@ -153,10 +155,10 @@ auto SerializerNew() -> std::unique_ptr<serde::Serializer>
   return std::make_unique<YamlSerializer>();
 }
 
-auto SerializerOutput(serde::Serializer* ser) -> Result<std::string, serde::Error>
+auto SerializerOutput(serde::Serializer* ser) -> cpp::result<std::string, serde::Error>
 {
   auto yamlser = static_cast<YamlSerializer*>(ser);
-  return Ok(yamlser->emit());
+  return yamlser->emit();
 }
 
 } // namespace detail

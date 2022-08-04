@@ -9,8 +9,8 @@ namespace serde {
 
 template<>
 struct Deserialize<std::unique_ptr> {
-  template<typename T>
-  static void deserialize(Deserializer& de, std::unique_ptr<T>& val) {
+  template<typename T, typename Deleter>
+  static void deserialize(Deserializer& de, std::unique_ptr<T, Deleter>& val) {
     bool is_some = false;
     de.deserialize_is_some(is_some);
     if (is_some) {

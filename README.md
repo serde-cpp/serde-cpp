@@ -96,6 +96,7 @@ Roadmap
   - [ ] additional attributes (skip, rename, getter, setter, flatten, skip\_none, default, ...)
 - [ ] Validate serde calls (seq/map utils) at interface level before impl (protected virtual)
 - [ ] Serde Union support
+- [ ] Support non-default constructable types
 - [ ] serde test suite
   - [ ] Invalid hierarchy (map/seq/struct..)
   - [ ] User Complex types
