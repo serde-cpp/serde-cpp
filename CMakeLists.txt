@@ -20,7 +20,7 @@ set(STANDALONE FALSE)
 message(STATUS "Configuring serde-cpp: Subdirectory project")
 endif()
 
-# Serde-cpp installation
+# Serde-cpp installation directory
 if(SERDE_CPP_INSTALL AND STANDALONE)
 set(INSTALL_DIR ${CMAKE_INSTALL_PREFIX})
 else()
@@ -39,7 +39,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE} (${PROJECT_NAME})")
 # Module ExternaProject for building projects in external trees.
 include(ExternalProject)
 # Include the external libraries in the path where cmake looks for find_package/library.
-list(PREPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}/external")
+set(PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}/external:${CMAKE_PREFIX_PATH}")
 # `external` directory contains all dependency libraries for the sub-projects.
 add_subdirectory(external)
 
@@ -55,7 +55,7 @@ ExternalProject_Add(serde-cpp
     CMAKE_ARGS
         -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        -DCMAKE_PREFIX_PATH="${PREFIX_PATH}"
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     DEPENDS
@@ -63,17 +63,17 @@ ExternalProject_Add(serde-cpp
         googletest_external)
 
 #########################################################################################
-# Re-export project targets for add_subdirectory use case
+# Re-export sub-project's targets for add_subdirectory use case
 #########################################################################################
 if(NOT STANDALONE)
 file(MAKE_DIRECTORY ${INSTALL_DIR}/include)
 
-message(STATUS "Adding target: serde_cpp::serde")
+message(STATUS "Imported target: serde_cpp::serde")
 add_library(serde_cpp::serde INTERFACE IMPORTED GLOBAL)
 target_include_directories(serde_cpp::serde INTERFACE ${INSTALL_DIR}/include)
 add_dependencies(serde_cpp::serde serde-cpp)
 
-message(STATUS "Adding target: serde_cpp::serde_yaml")
+message(STATUS "Imported target: serde_cpp::serde_yaml")
 add_library(serde_cpp::serde_yaml STATIC IMPORTED GLOBAL)
 set_target_properties(serde_cpp::serde_yaml PROPERTIES IMPORTED_LOCATION ${INSTALL_DIR}/lib/libserde_yaml.a)
 target_include_directories(serde_cpp::serde_yaml INTERFACE ${INSTALL_DIR}/include)

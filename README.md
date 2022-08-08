@@ -30,7 +30,7 @@ int main() {
 }
 ```
 
-No macros, no duplicate description of the struct fields, nothing else.. only [[serde]] attribute needed.
+No macros, no duplicate description of the struct's fields, nothing else.. only [[serde]] attribute needed.
 
 How we do it
 ---
