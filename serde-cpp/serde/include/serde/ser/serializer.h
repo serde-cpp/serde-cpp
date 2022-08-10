@@ -24,6 +24,7 @@ public:
   template<typename T>
   inline void serialize(const T& v) {
     if constexpr (traits::HasMemberSerialize<T>::value) v.serialize(*this);
+    else if constexpr (traits::HasSerialize<T>::value) SerializeT<T>::serialize(*this, v);
     else serde::serialize(*this, v);
   }
 

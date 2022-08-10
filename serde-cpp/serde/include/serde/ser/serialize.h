@@ -9,6 +9,14 @@ namespace serde {
 template<typename T>
 void serialize(class Serializer& ser, const T& val);
 
+// Serialization for simple types but with the perks of specialization only on instanciation
+template<typename T, typename = void>
+struct SerializeT;
+// {
+//   static void serialize(class Serializer& ser, const T& val);
+// };
+// SerializerT not defined because we check for specialization in constexpr evaluation
+
 
 // Serialization for template types should ONLY specialize struct Serialize::serialize below.
 // The specialization for template types must be available concretely before the Serializer is invoked!
@@ -17,6 +25,7 @@ struct Serialize {
   template<typename... U>
   static void serialize(class Serializer& ser, const T<U...>& val);
 };
+// TODO: evaluate removing definition of Serialize (and variations) for breaking at compile time instead of link time
 
 // Serialization for template types, forwards to struct Serialize::serialize.
 template<template<typename...> typename T, typename... U>

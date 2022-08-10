@@ -108,17 +108,17 @@ TEST(Std, SharedPtr_Empty)
 
 TEST(Std, Optional_Value)
 {
-  using Type = std::optional<types::Number>;
-  const Type val = types::Number::Three;
+  using Type = std::optional<int>;
+  const Type val = 10;
   auto str = serde_yaml::to_string(val).value();
-  EXPECT_STREQ(str.c_str(), "Three\n");
+  EXPECT_STREQ(str.c_str(), "10\n");
   auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
   EXPECT_EQ((int)*val, (int)*de_val);
 }
 
 TEST(Std, Optional_Null)
 {
-  using Type = std::optional<types::Number>;
+  using Type = std::optional<int>;
   const Type val = std::nullopt;
   auto str = serde_yaml::to_string(val).value();
   EXPECT_STREQ(str.c_str(), "null\n");

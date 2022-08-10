@@ -91,3 +91,99 @@ TEST(Advanced, LocalPrivateTypes)
   EXPECT_EQ(local, de_local);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Serialize specialization for incomplete Template type
+///////////////////////////////////////////////////////////////////////////////
+
+// Type forward-declaration
+template<typename T> struct Foo;
+
+// Serialize specialization
+namespace serde {
+template<>
+struct Serialize<Foo> {
+  template<typename... U>
+  static void serialize(Serializer& ser, const Foo<U...>& val) {
+    ser.serialize(val.v);
+  }
+};
+}
+
+// Type definition
+template<typename T> struct Foo
+{
+  T v = 0;
+};
+
+TEST(Advanced, Foo)
+{
+  Foo<int> foo{};
+  auto str = serde_yaml::to_string(foo).value();
+  EXPECT_STREQ(str.c_str(), "0\n");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialize specialization for incomplete type (struct/class)
+///////////////////////////////////////////////////////////////////////////////
+
+// Type forward-declaration
+struct Bar;
+
+// Serialize specialization
+namespace serde {
+template<typename T>
+struct SerializeT<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
+  static void serialize(Serializer& ser, const T& val) {
+    ser.serialize(val.v);
+  }
+};
+} // namespace serde
+
+// Type definition
+struct Bar {
+  int v = 0;
+};
+
+TEST(Advanced, Bar)
+{
+  Bar bar{};
+  auto str = serde_yaml::to_string(bar).value();
+  EXPECT_STREQ(str.c_str(), "0\n");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Serialize specialization for incomplete type (enum)
+///////////////////////////////////////////////////////////////////////////////
+
+// Type forward-declaration
+enum class Egg;
+
+// Serialize specialization
+namespace serde {
+template<typename T>
+struct SerializeT<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
+  static void serialize(Serializer& ser, const T& val) {
+    const char* cstr = "<null>";
+    switch (val) {
+      case T::Yolk: cstr = "Yolk"; break;
+      case T::Whites: cstr = "Whites"; break;
+    }
+    ser.serialize(cstr);
+  }
+};
+} // namespace serde
+
+// Type definition
+enum class Egg {
+  Yolk,
+  Whites,
+};
+
+TEST(Advanced, Egg)
+{
+  auto egg = Egg::Whites;
+  auto str = serde_yaml::to_string(egg).value();
+  EXPECT_STREQ(str.c_str(), "Whites\n");
+}
+
