@@ -101,7 +101,7 @@ template<typename T> struct Foo;
 // Serialize specialization
 namespace serde {
 template<>
-struct Serialize<Foo> {
+struct SerializeT<Foo> {
   template<typename... U>
   static void serialize(Serializer& ser, const Foo<U...>& val) {
     ser.serialize(val.v);
@@ -133,7 +133,7 @@ struct Bar;
 // Serialize specialization
 namespace serde {
 template<typename T>
-struct SerializeT<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
+struct Serialize<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
   static void serialize(Serializer& ser, const T& val) {
     ser.serialize(val.v);
   }
@@ -162,7 +162,7 @@ enum class Egg;
 // Serialize specialization
 namespace serde {
 template<typename T>
-struct SerializeT<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
+struct Serialize<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
   static void serialize(Serializer& ser, const T& val) {
     const char* cstr = "<null>";
     switch (val) {

@@ -110,3 +110,4 @@ Roadmap
 - [ ] serde\_yaml test suite
   - [ ] full api test
 - [ ] CMake package
+- [ ] Support wchar\_t and other CharT

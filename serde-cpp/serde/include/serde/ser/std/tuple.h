@@ -1,16 +1,15 @@
 #pragma once
 
 #include <tuple>
-
 #include "../serialize.h"
 #include "../serializer.h"
 
 namespace serde {
 
 template<>
-struct Serialize<std::tuple> {
-  template<typename... U>
-  static void serialize(Serializer& ser, const std::tuple<U...>& tuple) {
+struct SerializeT<std::tuple> {
+  template<typename... Ts>
+  static void serialize(Serializer& ser, const std::tuple<Ts...>& tuple) {
     ser.serialize_seq_begin();
     std::apply([&ser] (auto&... args) {
       (ser.serialize(args), ...);
@@ -20,4 +19,3 @@ struct Serialize<std::tuple> {
 };
 
 } // namespace serde
-

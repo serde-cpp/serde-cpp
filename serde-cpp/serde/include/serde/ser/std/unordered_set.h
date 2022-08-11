@@ -1,14 +1,13 @@
 #pragma once
 
 #include <unordered_set>
-
 #include "../serialize.h"
 #include "../serializer.h"
 
 namespace serde {
 
 template<>
-struct Serialize<std::unordered_set> {
+struct SerializeT<std::unordered_set> {
   template<typename Key, typename... U>
   static void serialize(Serializer& ser, const std::unordered_set<Key, U...>& set) {
     ser.serialize_seq_begin();
@@ -19,7 +18,7 @@ struct Serialize<std::unordered_set> {
 };
 
 template<>
-struct Serialize<std::unordered_multiset> {
+struct SerializeT<std::unordered_multiset> {
   template<typename Key, typename... U>
   static void serialize(Serializer& ser, const std::unordered_multiset<Key, U...>& multiset) {
     ser.serialize_seq_begin();
@@ -30,6 +29,3 @@ struct Serialize<std::unordered_multiset> {
 };
 
 } // namespace serde
-
-
-

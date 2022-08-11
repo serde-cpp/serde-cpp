@@ -531,7 +531,7 @@ TEST(Std, Queue_Value)
   Type val; val.push("clubs"); val.push("queen"); val.push("king");
   std::string str = "- clubs\n- queen\n- king\n";
   // no serialization for queue
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Serialize<std::queue>::serialize<std::string>)>);
+  //static_assert(!std::is_member_function_pointer_v<decltype(&serde::SerializeT<std::queue>::serialize<std::string>)>);
   auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
   EXPECT_EQ(de_val, val);
 }
@@ -542,7 +542,7 @@ TEST(Std, Queue_Empty)
   Type val;
   std::string str = " []\n";
   // no serialization for queue
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Serialize<std::queue>::serialize<std::string>)>);
+  //static_assert(!std::is_member_function_pointer_v<decltype(&serde::SerializeT<std::queue>::serialize<std::string>)>);
   auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
   EXPECT_EQ(de_val, val);
 }
@@ -557,7 +557,7 @@ TEST(Std, Stack_Value)
   Type val; val.push("clubs"); val.push("queen"); val.push("king");
   std::string str = "- clubs\n- queen\n- king\n";
   // no serialization for stack
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Serialize<std::stack>::serialize<std::string>)>);
+  //static_assert(!std::is_member_function_pointer_v<decltype(&serde::SerializeT<std::stack>::serialize<std::string>)>);
   auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
   EXPECT_EQ(de_val, val);
 }
@@ -568,7 +568,7 @@ TEST(Std, Stack_Empty)
   Type val;
   std::string str = " []\n";
   // no serialization for stack
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Serialize<std::stack>::serialize<std::string>)>);
+  //static_assert(!std::is_member_function_pointer_v<decltype(&serde::SerializeT<std::stack>::serialize<std::string>)>);
   auto de_val = serde_yaml::from_str<Type>(std::move(str)).value();
   EXPECT_EQ(de_val, val);
 }

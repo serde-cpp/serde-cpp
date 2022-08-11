@@ -1,14 +1,13 @@
 #pragma once
 
 #include <unordered_map>
-
 #include "../serialize.h"
 #include "../serializer.h"
 
 namespace serde {
 
 template<>
-struct Serialize<std::unordered_map> {
+struct SerializeT<std::unordered_map> {
   template<typename Key, typename Value, typename... U>
   static void serialize(Serializer& ser, const std::unordered_map<Key, Value, U...>& map) {
     ser.serialize_map_begin();
@@ -19,7 +18,7 @@ struct Serialize<std::unordered_map> {
 };
 
 template<>
-struct Serialize<std::unordered_multimap> {
+struct SerializeT<std::unordered_multimap> {
   template<typename Key, typename Value, typename... U>
   static void serialize(Serializer& ser, const std::unordered_multimap<Key, Value, U...>& multimap) {
     ser.serialize_map_begin();
@@ -30,4 +29,3 @@ struct Serialize<std::unordered_multimap> {
 };
 
 } // namespace serde
-

@@ -1,14 +1,13 @@
 #pragma once
 
 #include <memory>
-
 #include "../serialize.h"
 #include "../serializer.h"
 
 namespace serde {
 
 template<>
-struct Serialize<std::unique_ptr> {
+struct SerializeT<std::unique_ptr> {
   template<typename T, typename Deleter>
   static void serialize(Serializer& ser, const std::unique_ptr<T, Deleter>& val) {
     if (val)
@@ -19,7 +18,7 @@ struct Serialize<std::unique_ptr> {
 };
 
 template<>
-struct Serialize<std::shared_ptr> {
+struct SerializeT<std::shared_ptr> {
   template<typename T>
   static void serialize(Serializer& ser, const std::shared_ptr<T>& val) {
     if (val)
@@ -30,4 +29,3 @@ struct Serialize<std::shared_ptr> {
 };
 
 } // namespace serde
-

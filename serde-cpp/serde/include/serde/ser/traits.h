@@ -9,7 +9,7 @@ namespace serde {
 class Serializer;
 
 template<typename T, typename>
-struct SerializeT;
+struct Serialize;
 
 } // namespace serde
 
@@ -27,12 +27,12 @@ struct HasMemberSerialize<T, std::enable_if_t<std::is_invocable_r_v<void, declty
 : public std::true_type {};
 
 
-// Trait for detecting whether T has SerializeT<T, void>::serialize static function
+// Trait for detecting whether T has Serialize<T, void>::serialize static function
 template<typename T, typename = void>
 struct HasSerialize : public std::false_type {};
 
 template<typename T>
-struct HasSerialize<T, std::enable_if_t<std::is_invocable_r_v<void, decltype(&SerializeT<T, void>::serialize), Serializer&, const T&>>>
+struct HasSerialize<T, std::enable_if_t<std::is_invocable_r_v<void, decltype(&Serialize<T, void>::serialize), Serializer&, const T&>>>
 : public std::true_type {};
 
 } // namespace serde::traits

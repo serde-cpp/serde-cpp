@@ -1,16 +1,15 @@
 #pragma once
 
 #include <set>
-
 #include "../serialize.h"
 #include "../serializer.h"
 
 namespace serde {
 
 template<>
-struct Serialize<std::set> {
-  template<typename Key, typename... U>
-  static void serialize(Serializer& ser, const std::set<Key, U...>& set) {
+struct SerializeT<std::set> {
+  template<typename Key, typename Cmp, typename Alloc>
+  static void serialize(Serializer& ser, const std::set<Key, Cmp, Alloc>& set) {
     ser.serialize_seq_begin();
     for (auto& e : set)
       ser.serialize(e);
@@ -19,9 +18,9 @@ struct Serialize<std::set> {
 };
 
 template<>
-struct Serialize<std::multiset> {
-  template<typename Key, typename... U>
-  static void serialize(Serializer& ser, const std::multiset<Key, U...>& multiset) {
+struct SerializeT<std::multiset> {
+  template<typename Key, typename Cmp, typename Alloc>
+  static void serialize(Serializer& ser, const std::multiset<Key, Cmp, Alloc>& multiset) {
     ser.serialize_seq_begin();
     for (auto& e : multiset)
       ser.serialize(e);
@@ -30,4 +29,3 @@ struct Serialize<std::multiset> {
 };
 
 } // namespace serde
-

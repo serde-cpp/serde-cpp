@@ -1,16 +1,15 @@
 #pragma once
 
 #include <variant>
-
 #include "../serialize.h"
 #include "../serializer.h"
 
 namespace serde {
 
 template<>
-struct Serialize<std::variant> {
-  template<typename... U>
-  static void serialize(Serializer& ser, const std::variant<U...>& variant) {
+struct SerializeT<std::variant> {
+  template<typename... Ts>
+  static void serialize(Serializer& ser, const std::variant<Ts...>& variant) {
     size_t index = variant.index();
     ser.serialize_map_begin();
     ser.serialize_map_key(index);
@@ -22,4 +21,3 @@ struct Serialize<std::variant> {
 };
 
 } // namespace serde
-
