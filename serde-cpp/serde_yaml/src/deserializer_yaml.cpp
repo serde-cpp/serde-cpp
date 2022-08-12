@@ -113,7 +113,38 @@ public:
         *val = '\0';
     }
   }
-  void deserialize_bytes(unsigned char* val, size_t len) final {
+
+  void deserialize_bytes(void* val, size_t len) final {
+    auto& curr = stack.top();
+    if (!curr.valid() || curr.is_seed() || !curr.get()) {
+      std::cerr << "no scalar to extract" << std::endl;
+      return; // TODO: mark error
+    }
+
+    if (expect_key) {
+      if (curr.has_key()) {
+        if (len) {
+          curr.deserialize_key(ryml::fmt::base64(val, len));
+        }
+        //std::cout << "got key " << val << std::endl;
+      }
+      else {
+        std::cerr << "no key to extract" << std::endl;
+      }
+    }
+    else if (curr.has_val()) {
+      if (len) {
+        curr.deserialize_val(ryml::fmt::base64(val, len));
+      }
+      //std::cout << "got val " << val << std::endl;
+      if (curr.has_parent() && curr.parent_is_seq()) {
+        //std::cout << "next_sibling" << std::endl;
+        curr = curr.next_sibling();
+      }
+    }
+    else {
+      //std::cerr << "no value to extract" << std::endl;
+    }
   }
 
   void deserialize_length(size_t& len) final {

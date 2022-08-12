@@ -47,7 +47,7 @@ public:
   virtual void serialize_char(char) = 0;
   virtual void serialize_uchar(unsigned char) = 0;
   virtual void serialize_cstr(const char*) = 0;
-  virtual void serialize_bytes(unsigned char* val, size_t len) = 0;
+  virtual void serialize_bytes(const void* val, size_t len) = 0;
 
   // Optional //////////////////////////////////////////////////////////////////
   virtual void serialize_none() = 0;

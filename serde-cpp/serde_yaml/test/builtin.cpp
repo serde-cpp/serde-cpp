@@ -7,6 +7,8 @@
 // Builtin types
 ///////////////////////////////////////////////////////////////////////////////
 
+// TODO: wchar_t
+
 TEST(Builtin, Bool_True)
 {
   bool val = true;
@@ -208,4 +210,15 @@ TEST(Builtin, LiteralCharArray)
   EXPECT_STREQ(de_val.val, "Wiggle");
 }
 
-// TODO: wchar_t
+TEST(Builtin, Bytes) // base64 encoded
+{
+  struct Struct {
+    uint8_t val[10] = {0xde, 0xad, 0xbe, 0xef, 0x00, 0x22, 0x33, 0x44, 0x56, 0x98};
+    void serialize(serde::Serializer& ser) const { ser.serialize_bytes(val, sizeof(val)); }
+    void deserialize(serde::Deserializer& de) { de.deserialize_bytes(val, sizeof(val)); }
+  } val;
+  auto str = serde_yaml::to_string(val).value();
+  EXPECT_STREQ(str.c_str(), "3q2+7wAiM0RWmA==\n");
+  auto de_val = serde_yaml::from_str<Struct>(std::move(str)).value();
+  EXPECT_TRUE(0 == memcmp(val.val, de_val.val, sizeof(Struct::val)));
+}

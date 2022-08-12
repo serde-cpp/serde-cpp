@@ -37,7 +37,8 @@ public:
   void serialize_char(char v) final { serialize_scalar(v); }
   void serialize_uchar(unsigned char v) final { serialize_scalar(v); }
   void serialize_cstr(const char* v) final { serialize_scalar(v); }
-  void serialize_bytes(unsigned char* val, size_t len) final {
+  void serialize_bytes(const void* val, size_t len) final {
+    serialize_scalar(ryml::fmt::cbase64(val, len));
   }
 
   // Optional //////////////////////////////////////////////////////////////////
