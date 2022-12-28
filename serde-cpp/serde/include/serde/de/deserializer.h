@@ -11,6 +11,7 @@ public:
   template<typename T>
   inline void deserialize(T& v) {
     if constexpr (traits::HasMemberDeserialize<T>::value) v.deserialize(*this);
+    else if constexpr (traits::HasDeserialize<T>::value) DeserializeT<T>::deserialize(*this, v);
     else serde::deserialize(*this, v);
   }
 

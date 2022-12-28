@@ -90,7 +90,7 @@ Roadmap
   - [x] initializer\_list
 - [x] Test std types serialization
 - [x] Test builtin types serialization
-- [x] Serialization for incomplete simple/template types (struct/class/enum)
+- [x] De/Serialization for incomplete simple/template types (struct/class/enum)
 - [ ] Proper parsing/emitting error return
 - [ ] Serde generation with attributes for user types
   - [ ] enum

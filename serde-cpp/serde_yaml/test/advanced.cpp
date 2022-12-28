@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
+#include "serde/std.h"
 #include "serde/serde.h"
 #include "serde_yaml/serde_yaml.h"
-#include "serde/std.h"
 
 #include "types.h"
 
@@ -92,14 +92,14 @@ TEST(Advanced, LocalPrivateTypes)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialize specialization for incomplete Template type
+// De/Serialize specialization for incomplete Template type
 ///////////////////////////////////////////////////////////////////////////////
 
 // Type forward-declaration
 template<typename T> struct Foo;
 
-// Serialize specialization
 namespace serde {
+// Serialize specialization
 template<>
 struct SerializeT<Foo> {
   template<typename... U>
@@ -107,49 +107,68 @@ struct SerializeT<Foo> {
     ser.serialize(val.v);
   }
 };
+// Deserialize specialization
+template<>
+struct Deserialize<Foo> {
+  template<typename... U>
+  static void deserialize(Deserializer& de, Foo<U...>& val) {
+    de.deserialize(val.v);
+  }
+};
 }
 
 // Type definition
 template<typename T> struct Foo
 {
-  T v = 0;
+  T v = 3;
 };
 
 TEST(Advanced, Foo)
 {
   Foo<int> foo{};
   auto str = serde_yaml::to_string(foo).value();
-  EXPECT_STREQ(str.c_str(), "0\n");
+  EXPECT_STREQ(str.c_str(), "3\n");
+  auto de = serde_yaml::from_str<Foo<int>>(std::move(str)).value();
+  EXPECT_EQ(foo.v, de.v);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Serialize specialization for incomplete type (struct/class)
+// De/Serialize specialization for incomplete type (struct/class)
 ///////////////////////////////////////////////////////////////////////////////
 
 // Type forward-declaration
 struct Bar;
 
-// Serialize specialization
 namespace serde {
+// Serialize specialization
 template<typename T>
 struct Serialize<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
   static void serialize(Serializer& ser, const T& val) {
     ser.serialize(val.v);
   }
 };
+// Deserialize specialization
+template<typename T>
+struct DeserializeT<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
+  static void deserialize(Deserializer& de, T& val) {
+    de.deserialize(val.v);
+  }
+};
 } // namespace serde
 
 // Type definition
 struct Bar {
-  int v = 0;
+  int v = 5;
 };
 
 TEST(Advanced, Bar)
 {
   Bar bar{};
   auto str = serde_yaml::to_string(bar).value();
-  EXPECT_STREQ(str.c_str(), "0\n");
+  EXPECT_STREQ(str.c_str(), "5\n");
+  auto de = serde_yaml::from_str<Bar>(std::move(str)).value();
+  EXPECT_EQ(bar.v, de.v);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -159,8 +178,8 @@ TEST(Advanced, Bar)
 // Type forward-declaration
 enum class Egg;
 
-// Serialize specialization
 namespace serde {
+// Serialize specialization
 template<typename T>
 struct Serialize<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
   static void serialize(Serializer& ser, const T& val) {
@@ -170,6 +189,18 @@ struct Serialize<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
       case T::Whites: cstr = "Whites"; break;
     }
     ser.serialize(cstr);
+  }
+};
+// Deserialize specialization
+template<typename T>
+struct DeserializeT<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
+  static void deserialize(Deserializer& de, T& val) {
+    char cstr[32] = {0};
+    de.deserialize(cstr);
+    std::string_view str(cstr);
+    if (str == "Yolk") val = T::Yolk;
+    else if (str == "Whites") val = T::Whites;
+    else return; // TODO: mark error
   }
 };
 } // namespace serde
@@ -185,5 +216,7 @@ TEST(Advanced, Egg)
   auto egg = Egg::Whites;
   auto str = serde_yaml::to_string(egg).value();
   EXPECT_STREQ(str.c_str(), "Whites\n");
+  auto de = serde_yaml::from_str<Egg>(std::move(str)).value();
+  EXPECT_EQ(egg, de);
 }
 

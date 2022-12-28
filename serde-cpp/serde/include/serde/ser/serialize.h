@@ -4,17 +4,21 @@
 
 namespace serde {
 
+// forward-declaration
+class Serializer;
+
+
 // Serialization for simple types should ONLY specialize function `serialize` below.
 // The specialization for simple types can be in a translation unit (.cpp).
 template<typename T>
-void serialize(class Serializer& ser, const T& val);
+void serialize(Serializer& ser, const T& val);
 
 // Serialization for simple types but with the perks of specialization only on instantiation.
 // Serialize is not defined here because we check for specialization in constexpr evaluation.
 template<typename T, typename = void>
 struct Serialize;
 // {
-//   static void serialize(class Serializer& ser, const T& val);
+//   static void serialize(Serializer& ser, const T& val);
 // };
 
 
@@ -23,13 +27,13 @@ struct Serialize;
 template<template<typename...> typename T>
 struct SerializeT {
   template<typename... U>
-  static void serialize(class Serializer& ser, const T<U...>& val);
+  static void serialize(Serializer& ser, const T<U...>& val);
 };
 // TODO: evaluate removing definition of Serialize (and variations) for breaking at compile time instead of link time
 
 // Serialization for template types, forwards to struct Serialize::serialize.
 template<template<typename...> typename T, typename... U>
-inline void serialize(class Serializer& ser, const T<U...>& val) {
+inline void serialize(Serializer& ser, const T<U...>& val) {
   SerializeT<T>::template serialize<U...>(ser, val);
 }
 
@@ -38,13 +42,13 @@ inline void serialize(class Serializer& ser, const T<U...>& val) {
 template<template<auto...> typename T>
 struct SerializeN {
   template<auto... N>
-  static void serialize(class Serializer& ser, const T<N...>& val);
+  static void serialize(Serializer& ser, const T<N...>& val);
 };
 
 // Serialization for template types with only integral parameter, e.g. std::bitset
 // forwards to struct SerializeN::serialize.
 template<template<auto...> typename T, auto... N>
-inline void serialize(class Serializer& ser, const T<N...>& val) {
+inline void serialize(Serializer& ser, const T<N...>& val) {
   SerializeN<T>::template serialize<N...>(ser, val);
 }
 
@@ -53,20 +57,20 @@ inline void serialize(class Serializer& ser, const T<N...>& val) {
 template<template<typename, auto, auto...> typename T>
 struct SerializeTN {
   template<typename U, auto... N>
-  static void serialize(class Serializer& ser, const T<U, N...>& val);
+  static void serialize(Serializer& ser, const T<U, N...>& val);
 };
 
 // Serialization for template types with typename and integral parameter, e.g. std::array.
 // forwards to struct SerializeTN::serialize.
 template<template<typename, auto, auto...> typename T, typename U, auto N, auto... M>
-inline void serialize(class Serializer& ser, const T<U, N, M...>& val) {
+inline void serialize(Serializer& ser, const T<U, N, M...>& val) {
   SerializeTN<T>::template serialize<U, N, M...>(ser, val);
 }
 
 
 // Serialization for string literals, builtin implementation!
 template<size_t N>
-void serialize(class Serializer& ser, const char (&val)[N]);
+void serialize(Serializer& ser, const char (&val)[N]);
 
 } // namespace serde
 
