@@ -1,14 +1,13 @@
 #pragma once
 
 #include <utility>
-
 #include "../deserialize.h"
 #include "../deserializer.h"
 
 namespace serde {
 
 template<>
-struct Deserialize<std::pair> {
+struct DeserializeT<std::pair> {
   template<typename T1, typename T2>
   static void deserialize(Deserializer& de, std::pair<T1, T2>& pair) {
     de.deserialize_struct_begin();

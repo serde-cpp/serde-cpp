@@ -1,16 +1,15 @@
 #pragma once
 
 #include <set>
-
 #include "../deserialize.h"
 #include "../deserializer.h"
 
 namespace serde {
 
 template<>
-struct Deserialize<std::set> {
-  template<typename Key, typename... U>
-  static void deserialize(Deserializer& de, std::set<Key, U...>& set) {
+struct DeserializeT<std::set> {
+  template<typename Key, typename Cmp, typename Alloc>
+  static void deserialize(Deserializer& de, std::set<Key, Cmp, Alloc>& set) {
     size_t size = 0;
     set.clear();
     de.deserialize_seq_size(size);
@@ -25,9 +24,9 @@ struct Deserialize<std::set> {
 };
 
 template<>
-struct Deserialize<std::multiset> {
-  template<typename Key, typename... U>
-  static void deserialize(Deserializer& de, std::multiset<Key, U...>& multiset) {
+struct DeserializeT<std::multiset> {
+  template<typename Key, typename Cmp, typename Alloc>
+  static void deserialize(Deserializer& de, std::multiset<Key, Cmp, Alloc>& multiset) {
     size_t size = 0;
     multiset.clear();
     de.deserialize_seq_size(size);

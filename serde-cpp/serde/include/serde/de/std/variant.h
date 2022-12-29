@@ -3,20 +3,19 @@
 #include <variant>
 #include <utility>
 #include <type_traits>
-
 #include "../deserialize.h"
 #include "../deserializer.h"
 
 namespace serde {
 
 template<>
-struct Deserialize<std::variant> {
-  template<typename... U>
-  static void deserialize(Deserializer& de, std::variant<U...>& variant) {
+struct DeserializeT<std::variant> {
+  template<typename... Ts>
+  static void deserialize(Deserializer& de, std::variant<Ts...>& variant) {
     de.deserialize_map_begin();
     size_t index = 0;
     de.deserialize_map_key(index);
-    deserialize_expand(de, variant, index, std::make_integer_sequence<size_t, sizeof...(U)>());
+    deserialize_expand(de, variant, index, std::make_integer_sequence<size_t, sizeof...(Ts)>());
     de.deserialize_map_end();
   }
 
@@ -34,8 +33,8 @@ private:
     }
   }
 
-  template<size_t I, typename... U>
-  static void deserialize_variant(Deserializer& de, std::variant<U...>& variant) {
+  template<size_t I, typename... Ts>
+  static void deserialize_variant(Deserializer& de, std::variant<Ts...>& variant) {
     using Type = std::remove_reference_t<decltype(std::get<I>(variant))>;
     Type value;
     de.deserialize_map_value(value);

@@ -8,9 +8,9 @@
 namespace serde {
 
 template<>
-struct Deserialize<std::stack> {
-  template<typename T, typename... U>
-  static void deserialize(Deserializer& de, std::stack<T, U...>& stack) {
+struct DeserializeT<std::stack> {
+  template<typename T, typename Seq>
+  static void deserialize(Deserializer& de, std::stack<T, Seq>& stack) {
     while (!stack.empty()) stack.pop(); // clear stack
     size_t size = 0;
     de.deserialize_seq_size(size);

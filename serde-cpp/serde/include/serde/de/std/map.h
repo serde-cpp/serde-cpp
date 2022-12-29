@@ -1,16 +1,15 @@
 #pragma once
 
 #include <map>
-
 #include "../deserialize.h"
 #include "../deserializer.h"
 
 namespace serde {
 
 template<>
-struct Deserialize<std::map> {
-  template<typename Key, typename Value, typename... U>
-  static void deserialize(Deserializer& de, std::map<Key, Value, U...>& map) {
+struct DeserializeT<std::map> {
+  template<typename Key, typename Value, typename Cmp, typename Alloc>
+  static void deserialize(Deserializer& de, std::map<Key, Value, Cmp, Alloc>& map) {
     size_t size = 0;
     map.clear();
     de.deserialize_map_size(size);
@@ -25,9 +24,9 @@ struct Deserialize<std::map> {
 };
 
 template<>
-struct Deserialize<std::multimap> {
-  template<typename Key, typename Value, typename... U>
-  static void deserialize(Deserializer& de, std::multimap<Key, Value, U...>& multimap) {
+struct DeserializeT<std::multimap> {
+  template<typename Key, typename Value, typename Cmp, typename Alloc>
+  static void deserialize(Deserializer& de, std::multimap<Key, Value, Cmp, Alloc>& multimap) {
     size_t size = 0;
     multimap.clear();
     de.deserialize_map_size(size);

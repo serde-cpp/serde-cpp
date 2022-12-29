@@ -16,7 +16,7 @@ void deserialize(Deserializer& de, T& val);
 // Deserialization for simple types but with the perks of specialization only on instantiation.
 // deserialize is not defined here because we check for specialization in constexpr evaluation.
 template<typename T, typename = void>
-struct DeserializeT;
+struct Deserialize;
 // {
 //   static void deserialize(Deserializer& de, const T& val);
 // };
@@ -25,7 +25,7 @@ struct DeserializeT;
 // Deserialization for template types should ONLY specialize struct Deserialize::deserialize below.
 // The specialization for template types must be available concretely before the Deserializer is invoked!
 template<template<typename...> typename T>
-struct Deserialize {
+struct DeserializeT {
   template<typename... U>
   static void deserialize(Deserializer& de, T<U...>& val);
 };
@@ -33,7 +33,7 @@ struct Deserialize {
 // Deserialization for template types, forwards to struct Deserialize::deserialize.
 template<template<typename...> typename T, typename... U>
 inline void deserialize(Deserializer& de, T<U...>& val) {
-  Deserialize<T>::template deserialize<U...>(de, val);
+  DeserializeT<T>::template deserialize<U...>(de, val);
 }
 
 

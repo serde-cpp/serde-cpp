@@ -1,16 +1,15 @@
 #pragma once
 
 #include <list>
-
 #include "../deserialize.h"
 #include "../deserializer.h"
 
 namespace serde {
 
 template<>
-struct Deserialize<std::list> {
-  template<typename... U>
-  static void deserialize(Deserializer& de, std::list<U...>& list) {
+struct DeserializeT<std::list> {
+  template<typename T, typename Alloc>
+  static void deserialize(Deserializer& de, std::list<T, Alloc>& list) {
     size_t size = 0;
     de.deserialize_seq_size(size);
     de.deserialize_seq_begin();

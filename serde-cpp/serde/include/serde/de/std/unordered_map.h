@@ -1,14 +1,13 @@
 #pragma once
 
 #include <unordered_map>
-
 #include "../deserialize.h"
 #include "../deserializer.h"
 
 namespace serde {
 
 template<>
-struct Deserialize<std::unordered_map> {
+struct DeserializeT<std::unordered_map> {
   template<typename Key, typename Value, typename... U>
   static void deserialize(Deserializer& de, std::unordered_map<Key, Value, U...>& map) {
     size_t size = 0;
@@ -25,7 +24,7 @@ struct Deserialize<std::unordered_map> {
 };
 
 template<>
-struct Deserialize<std::unordered_multimap> {
+struct DeserializeT<std::unordered_multimap> {
   template<typename Key, typename Value, typename... U>
   static void deserialize(Deserializer& de, std::unordered_multimap<Key, Value, U...>& multimap) {
     size_t size = 0;

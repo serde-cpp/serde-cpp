@@ -109,7 +109,7 @@ struct SerializeT<Foo> {
 };
 // Deserialize specialization
 template<>
-struct Deserialize<Foo> {
+struct DeserializeT<Foo> {
   template<typename... U>
   static void deserialize(Deserializer& de, Foo<U...>& val) {
     de.deserialize(val.v);
@@ -150,7 +150,7 @@ struct Serialize<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
 };
 // Deserialize specialization
 template<typename T>
-struct DeserializeT<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
+struct Deserialize<T, std::enable_if_t<std::is_same_v<T, Bar>>> {
   static void deserialize(Deserializer& de, T& val) {
     de.deserialize(val.v);
   }
@@ -193,7 +193,7 @@ struct Serialize<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
 };
 // Deserialize specialization
 template<typename T>
-struct DeserializeT<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
+struct Deserialize<T, std::enable_if_t<std::is_same_v<T, Egg>>> {
   static void deserialize(Deserializer& de, T& val) {
     char cstr[32] = {0};
     de.deserialize(cstr);

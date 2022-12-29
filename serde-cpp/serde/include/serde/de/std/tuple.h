@@ -1,16 +1,15 @@
 #pragma once
 
 #include <tuple>
-
 #include "../deserialize.h"
 #include "../deserializer.h"
 
 namespace serde {
 
 template<>
-struct Deserialize<std::tuple> {
-  template<typename... U>
-  static void deserialize(Deserializer& de, std::tuple<U...>& tuple) {
+struct DeserializeT<std::tuple> {
+  template<typename... Ts>
+  static void deserialize(Deserializer& de, std::tuple<Ts...>& tuple) {
     de.deserialize_seq_begin();
     std::apply([&de] (auto&... args) {
       (de.deserialize(args), ...);

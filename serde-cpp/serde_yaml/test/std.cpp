@@ -41,7 +41,7 @@ TEST(Std, StringView_Value)
   auto str = serde_yaml::to_string(val).value();
   EXPECT_STREQ(str.c_str(), "Hello World\n");
   // no deserialization for string_view
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
+  static_assert(!std::is_member_function_pointer_v<decltype(&serde::DeserializeT<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
 }
 
 TEST(Std, StringView_Empty)
@@ -51,7 +51,7 @@ TEST(Std, StringView_Empty)
   auto str = serde_yaml::to_string(val).value();
   EXPECT_STREQ(str.c_str(), "\n");
   // no deserialization for string_view
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
+  static_assert(!std::is_member_function_pointer_v<decltype(&serde::DeserializeT<std::basic_string_view>::deserialize<char, std::char_traits<char>>)>);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -244,7 +244,7 @@ TEST(Std, InitializerList_Value)
   auto str = serde_yaml::to_string(val).value();
   EXPECT_STREQ(str.c_str(), "- apple\n- banana\n- orange\n- avocado\n- blueberry\n");
   // no deserialization for initializer_list
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::initializer_list>::deserialize<std::string>)>);
+  static_assert(!std::is_member_function_pointer_v<decltype(&serde::DeserializeT<std::initializer_list>::deserialize<std::string>)>);
 }
 
 TEST(Std, InitializerList_Empty)
@@ -254,7 +254,7 @@ TEST(Std, InitializerList_Empty)
   auto str = serde_yaml::to_string(val).value();
   EXPECT_STREQ(str.c_str(), " []\n");
   // no deserialization for initializer_list
-  static_assert(!std::is_member_function_pointer_v<decltype(&serde::Deserialize<std::initializer_list>::deserialize<std::string>)>);
+  static_assert(!std::is_member_function_pointer_v<decltype(&serde::DeserializeT<std::initializer_list>::deserialize<std::string>)>);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

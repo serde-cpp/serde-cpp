@@ -8,9 +8,9 @@
 namespace serde {
 
 template<>
-struct Deserialize<std::vector> {
-  template<typename... U>
-  static void deserialize(Deserializer& de, std::vector<U...>& vec) {
+struct DeserializeT<std::vector> {
+  template<typename T, typename Alloc>
+  static void deserialize(Deserializer& de, std::vector<T, Alloc>& vec) {
     size_t size = 0;
     de.deserialize_seq_size(size);
     de.deserialize_seq_begin();
