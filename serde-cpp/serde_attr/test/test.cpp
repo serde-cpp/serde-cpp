@@ -3,6 +3,7 @@
 
 #include <serde_yaml/serde_yaml.h>
 #include "test_serde.h"
+#include "mytypes.h"
 
 struct [[serde]] Options
 {

@@ -317,12 +317,17 @@ int main(int argc, char* argv[])
     ("version", "display version information and exit")
     ("v,verbose", "be verbose when parsing")
     ("fatal_errors", "abort program when a parser error occurs, instead of doing error correction")
-    ("file", "the file that is being parsed (last positional argument)",
-     cxxopts::value<std::string>())
+    ("files", "the files that are being parsed (last positional argument)",
+     cxxopts::value<std::vector<std::string>>());
+  option_list.add_options("compilation")
+    ("database_dir", "set the directory where a 'compile_commands.json' file is located containing build information",
+    cxxopts::value<std::string>())
+    ("database_file", "set the file name whose configuration will be used regardless of the current file name",
+    cxxopts::value<std::string>())
     ("I,include_directory", "add directory to include search path",
      cxxopts::value<std::vector<std::string>>());
 
-  option_list.parse_positional("file");
+  option_list.parse_positional("files");
 
   auto options = option_list.parse(argc, argv);
   if (options.count("help")) {
@@ -334,12 +339,27 @@ int main(int argc, char* argv[])
     std::cout << '\n';
     std::cout << "Using libclang version " << CPPAST_CLANG_VERSION_STRING << '\n';
   }
-  else if (!options.count("file") || options["file"].as<std::string>().empty()) {
-    std::cerr << "missing file argument" << '\n';
+  else if (!options.count("files") || options["files"].as<std::vector<std::string>>().empty()) {
+    std::cerr << "missing files argument" << '\n';
     return 1;
   }
   else {
-    cppast::libclang_compile_config config;
+        // the compile config stores compilation flags
+        cppast::libclang_compile_config config;
+        if (options.count("database_dir"))
+        {
+            cppast::libclang_compilation_database database(
+                options["database_dir"].as<std::string>());
+            if (options.count("database_file"))
+                config
+                    = cppast::libclang_compile_config(database,
+                                                      options["database_file"].as<std::string>());
+            else
+                config
+                    = cppast::libclang_compile_config(database, options["file"].as<std::string>());
+        }
+
+    //cppast::libclang_compile_config config;
     config.fast_preprocessing(1);
     cppast::compile_flags flags;
     config.set_flags(cppast::cpp_standard::cpp_17, flags);
@@ -351,61 +371,24 @@ int main(int argc, char* argv[])
     if (options.count("verbose"))
       logger.set_verbose(true);
 
-    auto file = parse_file(config, logger, options["file"].as<std::string>(), options.count("fatal_errors") == 1);
-    if (!file) return 2;
+    for (const auto& filename : options["files"].as<std::vector<std::string>>()) {
+      auto file = parse_file(config, logger, filename, options.count("fatal_errors") == 1);
+      if (!file) return 2;
 
-    print_ast(std::cout, *file);
+      print_ast(std::cout, *file);
 
+      std::string outfilename;
+      if (filename == "/home/njr/tmp/serde-cpp/serde-cpp/serde_attr/test/mytypes.h")
+        outfilename = "mytypes_serde.h";
+      else if (filename == "/home/njr/tmp/serde-cpp/serde-cpp/serde_attr/test/test.cpp")
+        outfilename = "test_serde.h";
 
-    std::ofstream outfile("test_serde.h");
+      std::ofstream outfile(outfilename);
 
-    generate_serde(outfile, *file);
-    return 0;
-
-    outfile << R"(
-#include <string>
-#include <serde/serde.h>
-#include <serde/std/string.h>
-
-struct Options;
-
-template<>
-void serde::serialize(serde::Serializer& ser, const Options& options)
-{
-  ser.serialize_struct_begin();
-    ser.serialize_struct_field("debug", options.debug);
-    ser.serialize_struct_field("line", options.line);
-    ser.serialize_struct_field("func", options.func);
-  ser.serialize_struct_end();
-}
-
-namespace serde {
-// Serialize specialization
-template<typename T>
-struct Serialize<T, std::enable_if_t<std::is_same_v<T, Options>>> {
-  static void serialize(Serializer& ser, const T& val) {
-    ser.serialize_struct_begin();
-      ser.serialize_struct_field("debug", options.debug);
-      ser.serialize_struct_field("line", options.line);
-      ser.serialize_struct_field("func", options.func);
-    ser.serialize_struct_end();
+      generate_serde(outfile, *file);
+    }
   }
-};
-// Deserialize specialization
-template<typename T>
-struct Deserialize<T, std::enable_if_t<std::is_same_v<T, Options>>> {
-  static void deserialize(Deserializer& de, T& val) {
-    de.deserialize_struct_begin();
-      de.deserialize_struct_field("debug", val.debug);
-      de.deserialize_struct_field("line", val.line);
-      de.deserialize_struct_field("func", val.func);
-    de.deserialize_struct_end();
-  }
-};
-} // namespace serde
 
-)";
-    outfile.close();
-  }
+  return 0;
 }
 
