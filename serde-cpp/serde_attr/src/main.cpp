@@ -8,6 +8,7 @@
 #include <cppast/cpp_forward_declarable.hpp> // for is_definition()
 #include <cppast/cpp_namespace.hpp>          // for cpp_namespace
 #include <cppast/libclang_parser.hpp> // for libclang_parser, libclang_compile_config, cpp_entity,...
+#include <cppast/cpp_member_variable.hpp>
 #include <cppast/visitor.hpp>         // for visit()
 
 // prints the AST entry of a cpp_entity (base class for all entities),
@@ -170,6 +171,141 @@ parse_file(const cppast::libclang_compile_config &config,
   return file;
 }
 
+void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file)
+{
+    outfile << R"(/* Auto-generated serde-cpp file! DO NOT EDIT!!! */
+
+#include <string>
+#include <serde/serde.h>
+#include <serde/std/string.h>
+)";
+
+    cppast::visit(file,
+        [](const cppast::cpp_entity& e) {
+            // only visit non-templated class definitions that have the attribute set
+            return (e.kind() == cppast::cpp_entity_kind::class_t
+                    && cppast::is_definition(e) && cppast::has_attribute(e, "serde"))
+                   // or all namespaces
+                   || e.kind() == cppast::cpp_entity_kind::namespace_t;
+        },
+        [&](const cppast::cpp_entity& e, cppast::visitor_info info) {
+            if (e.kind() == cppast::cpp_entity_kind::class_t && !info.is_old_entity())
+            {
+            auto& class_ = static_cast<const cppast::cpp_class&>(e);
+
+            // print the declaration of the entity
+            // it will only use a single line
+            // derive from code_generator and implement various callbacks for printing
+            // it will print into a std::string
+            class code_generator : public cppast::code_generator
+            {
+            std::string str_;                 // the result
+            bool        was_newline_ = false; // whether or not the last token was a newline
+                                              // needed for lazily printing them
+
+              public:
+            code_generator(const cppast::cpp_entity& e)
+            {
+              // kickoff code generation here
+              cppast::generate_code(*this, e);
+            }
+
+            // return the result
+            const std::string& str() const noexcept
+            {
+              return str_;
+            }
+
+              private:
+            // called to retrieve the generation options of an entity
+            generation_options do_get_options(const cppast::cpp_entity&,
+                cppast::cpp_access_specifier_kind) override
+            {
+              // generate declaration only
+              return code_generator::declaration;
+            }
+
+            // no need to handle indentation, as only a single line is used
+            void do_indent() override {}
+            void do_unindent() override {}
+
+            // called when a generic token sequence should be generated
+            // there are specialized callbacks for various token kinds,
+            // to e.g. implement syntax highlighting
+            void do_write_token_seq(cppast::string_view tokens) override
+            {
+              if (was_newline_)
+              {
+                // lazily append newline as space
+                str_ += ' ';
+                was_newline_ = false;
+              }
+              // append tokens
+              str_ += tokens.c_str();
+            }
+
+            // called when a newline should be generated
+            // we're lazy as it will always generate a trailing newline,
+            // we don't want
+            void do_write_newline() override
+            {
+              was_newline_ = true;
+            }
+
+            } generator(e);
+
+            outfile << "\n" << generator.str() << "\n";
+
+            outfile << R"(
+namespace serde {
+// Serialize specialization
+template<typename T>
+struct Serialize<T, std::enable_if_t<std::is_same_v<T, )" << e.name() << R"(>>> {
+  static void serialize(Serializer& ser, const T& val) {
+    ser.serialize_struct_begin();
+)";
+            // serialize member variables
+            for (auto& member : class_)
+            {
+                if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
+                  const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
+                  outfile << "      ser.serialize_struct_field(\""
+                          << member_var.name() << "\", val."
+                          << member_var.name() << ");\n";
+                }
+            }
+      outfile <<
+R"(    ser.serialize_struct_end();
+  }
+};
+// Deserialize specialization
+template<typename T>
+struct Deserialize<T, std::enable_if_t<std::is_same_v<T, )" << e.name() << R"(>>> {
+  static void deserialize(Deserializer& de, T& val) {
+    de.deserialize_struct_begin();
+)";
+            // deserialize member variables
+            for (auto& member : class_)
+            {
+                if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
+                  const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
+                  outfile << "      de.deserialize_struct_field(\""
+                          << member_var.name() << "\", val."
+                          << member_var.name() << ");\n";
+                }
+            }
+      outfile <<
+R"(    de.deserialize_struct_end();
+  }
+};
+} // namespace serde
+
+)";
+            }
+        });
+
+}
+
 int main(int argc, char* argv[])
 {
   cxxopts::Options option_list(
@@ -204,6 +340,7 @@ int main(int argc, char* argv[])
   }
   else {
     cppast::libclang_compile_config config;
+    config.fast_preprocessing(1);
     cppast::compile_flags flags;
     config.set_flags(cppast::cpp_standard::cpp_17, flags);
     if (options.count("include_directory"))
@@ -219,19 +356,18 @@ int main(int argc, char* argv[])
 
     print_ast(std::cout, *file);
 
-    std::ofstream outfile("test_serde.cpp");
+
+    std::ofstream outfile("test_serde.h");
+
+    generate_serde(outfile, *file);
+    return 0;
+
     outfile << R"(
 #include <string>
 #include <serde/serde.h>
 #include <serde/std/string.h>
-#include <serde_yaml/serde_yaml.h>
 
-struct [[serde]]
-Options {
-  bool debug;
-  int line;
-  std::string func;
-};
+struct Options;
 
 template<>
 void serde::serialize(serde::Serializer& ser, const Options& options)
@@ -242,6 +378,32 @@ void serde::serialize(serde::Serializer& ser, const Options& options)
     ser.serialize_struct_field("func", options.func);
   ser.serialize_struct_end();
 }
+
+namespace serde {
+// Serialize specialization
+template<typename T>
+struct Serialize<T, std::enable_if_t<std::is_same_v<T, Options>>> {
+  static void serialize(Serializer& ser, const T& val) {
+    ser.serialize_struct_begin();
+      ser.serialize_struct_field("debug", options.debug);
+      ser.serialize_struct_field("line", options.line);
+      ser.serialize_struct_field("func", options.func);
+    ser.serialize_struct_end();
+  }
+};
+// Deserialize specialization
+template<typename T>
+struct Deserialize<T, std::enable_if_t<std::is_same_v<T, Options>>> {
+  static void deserialize(Deserializer& de, T& val) {
+    de.deserialize_struct_begin();
+      de.deserialize_struct_field("debug", val.debug);
+      de.deserialize_struct_field("line", val.line);
+      de.deserialize_struct_field("func", val.func);
+    de.deserialize_struct_end();
+  }
+};
+} // namespace serde
+
 )";
     outfile.close();
   }

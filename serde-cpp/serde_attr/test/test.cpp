@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include <serde_yaml/serde_yaml.h>
+#include "test_serde.h"
 
 struct [[serde]] Options
 {
@@ -18,3 +19,9 @@ int main()
   return 0;
 }
 
+//namespace foo {
+struct [[serde]] Hello {
+  int value;
+  std::string when;
+};
+//}
