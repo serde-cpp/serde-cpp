@@ -53,12 +53,20 @@ function(serde_generate_target TARGET)
   # Export target's serde headers variable
   set("${TARGET}_SERDE_FILES" ${SERDE_HEADERS} PARENT_SCOPE)
 
-  # Command to generate the serde headers
-  add_custom_command(
-    OUTPUT ${SERDE_HEADERS}
-    COMMAND touch ${SERDE_HEADERS} && $<TARGET_FILE:serde_gen> --database_dir=${CMAKE_BINARY_DIR} --database_file=compile_commands.json ${SOURCES}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS serde_gen ${SOURCES})
+  # Get lenght of the list of files
+  list(LENGTH SERDE_HEADERS LENGTH)
+  math(EXPR MAX_IDX "${LENGTH} - 1")
+
+  # Generate a serde header for each source file
+  foreach(IDX RANGE ${MAX_IDX})
+    list(GET SERDE_HEADERS ${IDX} SERDE_HEADER)
+    list(GET SOURCES ${IDX} SOURCE)
+    add_custom_command(
+      OUTPUT ${SERDE_HEADER}
+      COMMAND touch ${SERDE_HEADER} && $<TARGET_FILE:serde_gen> --infile=${SOURCE} --outfile=${SERDE_HEADER} --database_dir=${CMAKE_BINARY_DIR} --database_file=compile_commands.json
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      DEPENDS serde_gen ${SOURCE})
+  endforeach()
 
   # Build dependency target
   add_custom_target("${TARGET}_custom" ALL DEPENDS ${SERDE_HEADERS})

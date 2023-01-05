@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
 #include <cxxopts.hpp>
 
@@ -316,18 +317,19 @@ int main(int argc, char* argv[])
     ("h,help", "display this help and exit")
     ("version", "display version information and exit")
     ("v,verbose", "be verbose when parsing")
-    ("fatal_errors", "abort program when a parser error occurs, instead of doing error correction")
-    ("files", "the files that are being parsed (last positional argument)",
-     cxxopts::value<std::vector<std::string>>());
+    ("fatal_errors", "abort program when a parser error occurs, instead of doing error correction");
+
   option_list.add_options("compilation")
+    ("infile", "the file that are being parsed",
+     cxxopts::value<std::string>())
+    ("outfile", "the output file that will be generated",
+     cxxopts::value<std::string>())
     ("database_dir", "set the directory where a 'compile_commands.json' file is located containing build information",
     cxxopts::value<std::string>())
     ("database_file", "set the file name whose configuration will be used regardless of the current file name",
     cxxopts::value<std::string>())
     ("I,include_directory", "add directory to include search path",
      cxxopts::value<std::vector<std::string>>());
-
-  option_list.parse_positional("files");
 
   auto options = option_list.parse(argc, argv);
   if (options.count("help")) {
@@ -339,8 +341,12 @@ int main(int argc, char* argv[])
     std::cout << '\n';
     std::cout << "Using libclang version " << CPPAST_CLANG_VERSION_STRING << '\n';
   }
-  else if (!options.count("files") || options["files"].as<std::vector<std::string>>().empty()) {
-    std::cerr << "missing files argument" << '\n';
+  else if (!options.count("infile") || options["infile"].as<std::string>().empty()) {
+    std::cerr << "missing infile argument" << '\n';
+    return 1;
+  }
+  else if (!options.count("outfile") || options["outfile"].as<std::string>().empty()) {
+    std::cerr << "missing outfile argument" << '\n';
     return 1;
   }
   else {
@@ -354,9 +360,9 @@ int main(int argc, char* argv[])
                 config
                     = cppast::libclang_compile_config(database,
                                                       options["database_file"].as<std::string>());
-            else
-                config
-                    = cppast::libclang_compile_config(database, options["file"].as<std::string>());
+            //else
+                //config
+                    //= cppast::libclang_compile_config(database, options["file"].as<std::string>());
         }
 
     //cppast::libclang_compile_config config;
@@ -371,22 +377,18 @@ int main(int argc, char* argv[])
     if (options.count("verbose"))
       logger.set_verbose(true);
 
-    for (const auto& filename : options["files"].as<std::vector<std::string>>()) {
-      auto file = parse_file(config, logger, filename, options.count("fatal_errors") == 1);
-      if (!file) return 2;
+    const auto& filename = options["infile"].as<std::string>();
+    auto file = parse_file(config, logger, filename, options.count("fatal_errors") == 1);
+    if (!file) return 2;
 
-      print_ast(std::cout, *file);
+    print_ast(std::cout, *file);
 
-      std::string outfilename;
-      if (filename == "/home/njr/tmp/serde-cpp/serde-cpp/serde_attr/test/mytypes.h")
-        outfilename = "mytypes_serde.h";
-      else if (filename == "/home/njr/tmp/serde-cpp/serde-cpp/serde_attr/test/test.cpp")
-        outfilename = "test_serde.h";
+    std::string outfilename = options["outfile"].as<std::string>();
+    auto basepath = std::filesystem::path(outfilename).remove_filename();
+    std::filesystem::create_directories(basepath);
 
-      std::ofstream outfile(outfilename);
-
-      generate_serde(outfile, *file);
-    }
+    std::ofstream outfile(outfilename);
+    generate_serde(outfile, *file);
   }
 
   return 0;
