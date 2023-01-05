@@ -92,6 +92,7 @@ Roadmap
 - [x] Test builtin types serialization
 - [x] De/Serialization for incomplete simple/template types (struct/class/enum)
 - [ ] De/Serialization for specialized types
+- [x] CMake exported function to generate serde files automatically
 - [ ] Proper parsing/emitting error return
 - [ ] Serde generation with attributes for user types
   - [ ] enum
