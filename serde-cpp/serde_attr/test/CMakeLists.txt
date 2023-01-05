@@ -20,6 +20,10 @@ add_executable(serde_attr_test)
 target_sources(serde_attr_test PRIVATE
   test.cpp
 )
-target_link_libraries(serde_attr_test PRIVATE serde serde_yaml test_serde_files)
+target_link_libraries(serde_attr_test PRIVATE
+  test_serde_files
+  serde_yaml
+  serde
+)
 target_compile_options(serde_attr_test PRIVATE -Wno-attributes)
 
