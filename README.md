@@ -63,6 +63,11 @@ void serde::deserialize(serde::Deserializer& de, Point& point)
 
 More information will be provided here in the future.
 
+Overview
+---
+
+![serde-diagram](extras/serde-diagram.png)
+
 Roadmap
 ---
 
