@@ -377,17 +377,22 @@ int main(int argc, char* argv[])
     if (options.count("verbose"))
       logger.set_verbose(true);
 
-    const auto& filename = options["infile"].as<std::string>();
-    auto file = parse_file(config, logger, filename, options.count("fatal_errors") == 1);
-    if (!file) return 2;
-
-    print_ast(std::cout, *file);
+    const auto& infilename = options["infile"].as<std::string>();
 
     std::string outfilename = options["outfile"].as<std::string>();
     auto basepath = std::filesystem::path(outfilename).remove_filename();
     std::filesystem::create_directories(basepath);
 
+    // pre-create output file for parsing #include of generated file
     std::ofstream outfile(outfilename);
+    outfile.close();
+
+    auto file = parse_file(config, logger, infilename, options.count("fatal_errors") == 1);
+    if (!file) return 2;
+
+    print_ast(std::cout, *file);
+
+    outfile.open(outfilename);
     generate_serde(outfile, *file);
   }
 

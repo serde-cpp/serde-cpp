@@ -37,6 +37,8 @@ function(serde_generate_target TARGET)
     endif()
     # Get file relative path
     cmake_path(RELATIVE_PATH FILE_ABSPATH OUTPUT_VARIABLE FILE_REALPATH)
+    # Check if file exists (throws error)
+    file(READ "${FILE_ABSPATH}" FILE_READ)
 
     # Add "_serde.h" suffix to source file
     string(REGEX REPLACE "(.+)[.][^.]+$" "\\1${ARG_SUFFIX}" SERDE_HEADER ${FILE_REALPATH})
@@ -63,7 +65,11 @@ function(serde_generate_target TARGET)
     list(GET SOURCES ${IDX} SOURCE)
     add_custom_command(
       OUTPUT ${SERDE_HEADER}
-      COMMAND touch ${SERDE_HEADER} && $<TARGET_FILE:serde_gen> --infile=${SOURCE} --outfile=${SERDE_HEADER} --database_dir=${CMAKE_BINARY_DIR} --database_file=compile_commands.json
+      COMMAND $<TARGET_FILE:serde_gen>
+                --infile=${SOURCE}
+                --outfile=${SERDE_HEADER}
+                --database_dir=${CMAKE_BINARY_DIR}
+                --database_file=compile_commands.json
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS serde_gen ${SOURCE})
   endforeach()
