@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include <serde_yaml/serde_yaml.h>
-#include "test_serde.h"
+#include "serde/test_serde.h"
 #include "mytypes.h"
 
 struct [[serde, serde::deny_unkown_fields, serde::rename_all(serialize="UPPERCASE")]]

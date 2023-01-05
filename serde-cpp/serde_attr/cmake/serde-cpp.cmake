@@ -5,6 +5,7 @@ include(CMakeParseArguments)
 # serde_generate_target(<target> [SUFFIX <suffix>])
 # ARGS:
 #   SUFFIX default: "_serde.h"
+#   OUTPUT_DIRECTORY default: "${CMAKE_CURRENT_BINARY_DIR}/"
 # TODO: pass suffix to serde_gen
 #########################################################################################
 function(serde_generate_target TARGET)
@@ -12,7 +13,7 @@ function(serde_generate_target TARGET)
   # Parse arguments
   set(prefix ARG)
   set(flags)
-  set(singleValues SUFFIX)
+  set(singleValues SUFFIX OUTPUT_DIRECTORY)
   set(multiValues)
   cmake_parse_arguments(PARSE_ARGV 1 "${prefix}" "${flags}" "${singleValues}" "${multiValues}")
 
@@ -24,6 +25,10 @@ function(serde_generate_target TARGET)
 
   if(NOT DEFINED ARG_SUFFIX OR ARG_SUFFIX STREQUAL "")
     set(ARG_SUFFIX "_serde.h")
+  endif()
+
+  if(NOT DEFINED ARG_OUTPUT_DIRECTORY OR ARG_OUTPUT_DIRECTORY STREQUAL "")
+    set(ARG_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endif()
 
   # Generate new list of serde header file names
@@ -45,7 +50,7 @@ function(serde_generate_target TARGET)
     if("${SERDE_HEADER}" STREQUAL "${FILE_REALPATH}")
       string(CONCAT SERDE_HEADER "${FILE_REALPATH}" "${ARG_SUFFIX}")
     endif()
-    string(PREPEND SERDE_HEADER "${CMAKE_CURRENT_BINARY_DIR}/")
+    string(PREPEND SERDE_HEADER "${ARG_OUTPUT_DIRECTORY}/")
 
     # Add file to control lists
     list(APPEND SERDE_HEADERS ${SERDE_HEADER})
