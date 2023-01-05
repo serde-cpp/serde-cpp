@@ -23,9 +23,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -pg -fsanitize=undefined -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -Wall")
 
 #########################################################################################
-# Libraries
+# Sub-directories
 #########################################################################################
 add_subdirectory(serde)
+add_subdirectory(serde_gen)
 add_subdirectory(serde_yaml)
-
-add_subdirectory(serde_attr)

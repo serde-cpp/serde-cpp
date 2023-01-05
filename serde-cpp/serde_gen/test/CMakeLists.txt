@@ -2,7 +2,7 @@
 # Tests
 #########################################################################################
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/serde_attr/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/serde_gen/cmake")
 include(serde-cpp)
 
 serde_generate_target(test_serde_files
@@ -14,10 +14,10 @@ add_executable(serde_attr_test)
 target_sources(serde_attr_test PRIVATE
   test.cpp
 )
-target_link_libraries(serde_attr_test PRIVATE
+target_link_libraries(serde_gen_test PRIVATE
   test_serde_files
   serde_yaml
   serde
 )
-target_compile_options(serde_attr_test PRIVATE -Wno-attributes)
+target_compile_options(serde_gen_test PRIVATE -Wno-attributes)
 
