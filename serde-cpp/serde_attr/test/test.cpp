@@ -5,11 +5,12 @@
 #include "test_serde.h"
 #include "mytypes.h"
 
-struct [[serde]] Options
+struct [[serde, serde::deny_unkown_fields, serde::rename_all(serialize="UPPERCASE")]]
+Options
 {
-  bool debug;
-  int line;
-  std::string func;
+  bool [[serde::skip]] debug;
+  int [[serde::rename("LINE")]] line;
+  std::string [[using serde: alias("fn"), alias("FUNC")]] func;
 };
 
 int main()
@@ -21,7 +22,8 @@ int main()
 }
 
 //namespace foo {
-struct [[serde]] Hello {
+struct [[serde, serde::deny_unkown_fields]]
+Hello {
   int value;
   std::string when;
 };

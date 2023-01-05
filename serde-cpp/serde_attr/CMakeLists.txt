@@ -1,8 +1,9 @@
 #########################################################################################
 # Dependencies
 #########################################################################################
+find_package(cxxopts)
 # CppAST to parse and work with the C++ AST
-set(CPPAST_BUILD_TOOL ON) # fetches cxxopts
+#set(CPPAST_BUILD_TOOL ON) # fetches cxxopts
 add_subdirectory(cppast)
 
 #########################################################################################
@@ -12,7 +13,7 @@ add_executable(serde_gen src/main.cpp)
 target_link_libraries(serde_gen PRIVATE
   serde
   cppast
-  cxxopts
+  cxxopts::cxxopts
 )
 install(TARGETS serde_gen)
 
