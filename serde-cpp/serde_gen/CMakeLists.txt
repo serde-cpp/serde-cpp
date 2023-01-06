@@ -9,7 +9,11 @@ add_subdirectory(cppast)
 #########################################################################################
 # serde_gen
 #########################################################################################
-add_executable(serde_gen src/main.cpp)
+add_executable(serde_gen
+  src/main.cpp
+  src/common.cpp
+  src/serde_gen.cpp
+)
 target_link_libraries(serde_gen PRIVATE
   serde
   cppast

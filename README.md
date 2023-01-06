@@ -98,7 +98,7 @@ Roadmap
 - [x] De/Serialization for incomplete simple/template types (struct/class/enum)
 - [ ] De/Serialization for specialized types
 - [x] CMake exported function to generate serde files automatically
-- [ ] Proper parsing/emitting error return
+- [ ] Proper parsing/emitting error return (use exceptions?)
 - [ ] Serde generation with attributes for user types
   - [ ] enum
   - [ ] struct (POD type)
@@ -118,3 +118,4 @@ Roadmap
   - [ ] full api test
 - [ ] CMake package
 - [ ] Support wchar\_t and other CharT
+- [ ] Serde-cpp project sample repo (using CMake's find\_package and add\_subdirectory)

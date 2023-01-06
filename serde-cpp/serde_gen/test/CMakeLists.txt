@@ -10,8 +10,8 @@ serde_generate_target(test_serde_files
   test.cpp
 )
 
-add_executable(serde_attr_test)
-target_sources(serde_attr_test PRIVATE
+add_executable(serde_gen_test)
+target_sources(serde_gen_test PRIVATE
   test.cpp
 )
 target_link_libraries(serde_gen_test PRIVATE
