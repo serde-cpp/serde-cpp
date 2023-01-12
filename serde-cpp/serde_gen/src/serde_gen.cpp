@@ -1,15 +1,17 @@
 #include <fstream>
 
-#include <cppast/code_generator.hpp>          // for generate_code()
-#include <cppast/cpp_entity_kind.hpp>         // for the cpp_entity_kind definition
-#include <cppast/cpp_forward_declarable.hpp>  // for is_definition()
+#include <cppast/code_generator.hpp>
+#include <cppast/cpp_entity_kind.hpp>
+#include <cppast/cpp_forward_declarable.hpp>
 #include <cppast/cpp_member_variable.hpp>
-#include <cppast/cpp_namespace.hpp>    // for cpp_namespace
-#include <cppast/libclang_parser.hpp>  // for libclang_parser, libclang_compile_config, cpp_entity,...
-#include <cppast/visitor.hpp>          // for visit()
+#include <cppast/cpp_namespace.hpp>
+#include <cppast/libclang_parser.hpp>
+#include <cppast/visitor.hpp>
 
 #include "code_generator.h"
 #include "common.h"
+
+namespace serde_gen {
 
 void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file)
 {
@@ -26,12 +28,9 @@ void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file)
     cppast::visit(
         file,
         [](const cppast::cpp_entity& e) {
-            // only visit non-templated class definitions that have the attribute
-            // set
             return (e.kind() == cppast::cpp_entity_kind::class_t && cppast::is_definition(e) &&
-                    cppast::has_attribute(e, "serde"))
-                   // or all namespaces
-                   || e.kind() == cppast::cpp_entity_kind::namespace_t;
+                    cppast::has_attribute(e, "serde")) ||
+                   e.kind() == cppast::cpp_entity_kind::namespace_t;
         },
         [&](const cppast::cpp_entity& e, cppast::visitor_info info) {
             if (e.kind() == cppast::cpp_entity_kind::class_t && !info.is_old_entity()) {
@@ -87,3 +86,5 @@ struct Deserialize<T, std::enable_if_t<std::is_same_v<T, )"
             }
         });
 }
+
+}  // namespace serde_gen

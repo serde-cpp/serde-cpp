@@ -2,15 +2,17 @@
 
 #include <iostream>
 
-#include <cppast/code_generator.hpp>          // for generate_code()
-#include <cppast/cpp_entity_kind.hpp>         // for the cpp_entity_kind definition
-#include <cppast/cpp_forward_declarable.hpp>  // for is_definition()
+#include <cppast/code_generator.hpp>
+#include <cppast/cpp_entity_kind.hpp>
+#include <cppast/cpp_forward_declarable.hpp>
 #include <cppast/cpp_member_variable.hpp>
-#include <cppast/cpp_namespace.hpp>    // for cpp_namespace
-#include <cppast/libclang_parser.hpp>  // for libclang_parser, libclang_compile_config, cpp_entity,...
-#include <cppast/visitor.hpp>          // for visit()
+#include <cppast/cpp_namespace.hpp>
+#include <cppast/libclang_parser.hpp>
+#include <cppast/visitor.hpp>
 
 #include "code_generator.h"
+
+namespace serde_gen {
 
 auto parse_file(const cppast::libclang_compile_config& config,
                 const cppast::diagnostic_logger& logger, const std::string& filename,
@@ -105,3 +107,5 @@ void print_ast(std::ostream& out, const cppast::cpp_file& file)
         return true;
     });
 }
+
+}  // namespace serde_gen

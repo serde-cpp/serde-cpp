@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cppast/cpp_entity.hpp>
 
+namespace serde_gen {
+
 // parse file
 auto parse_file(const cppast::libclang_compile_config& config,
                 const cppast::diagnostic_logger& logger, const std::string& filename,
@@ -18,3 +20,5 @@ void print_ast(std::ostream& out, const cppast::cpp_file& file);
 
 // generate serde header
 void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file);
+
+}  // namespace serde_gen

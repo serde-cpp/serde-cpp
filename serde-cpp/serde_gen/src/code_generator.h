@@ -2,6 +2,8 @@
 
 #include <cppast/code_generator.hpp>
 
+namespace serde_gen {
+
 // print the declaration of the entity
 // it will only use a single line
 // derive from code_generator and implement various callbacks for printing
@@ -9,7 +11,7 @@
 class code_generator : public cppast::code_generator {
     std::string str_;           // the result
     bool was_newline_ = false;  // whether or not the last token was a newline
-                                // needed for lazily printing them
+    // needed for lazily printing them
 
    public:
     code_generator(const cppast::cpp_entity& e)
@@ -32,6 +34,7 @@ class code_generator : public cppast::code_generator {
 
     // no need to handle indentation, as only a single line is used
     void do_indent() override {}
+
     void do_unindent() override {}
 
     // called when a generic token sequence should be generated
@@ -53,3 +56,5 @@ class code_generator : public cppast::code_generator {
     // we don't want
     void do_write_newline() override { was_newline_ = true; }
 };
+
+}  // namespace serde_gen
