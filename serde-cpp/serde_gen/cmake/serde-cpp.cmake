@@ -71,10 +71,11 @@ function(serde_generate_target TARGET)
     add_custom_command(
       OUTPUT ${SERDE_HEADER}
       COMMAND $<TARGET_FILE:serde_gen>
-                --infile=${SOURCE}
-                --outfile=${SERDE_HEADER}
+                --source=${SOURCE}
+                --output=${SERDE_HEADER}
                 --database_dir=${CMAKE_BINARY_DIR}
                 --database_file=compile_commands.json
+                --verbose
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS serde_gen ${SOURCE})
   endforeach()

@@ -108,12 +108,14 @@ static auto init_diagnostic_logger(const cxxopts::ParseResult& options)
     return logger;
 }
 
-static auto create_output_file(const std::string& filename)
+static auto create_file(const std::string& filename)
 {
     auto out_base_path = std::filesystem::path(filename).remove_filename();
     std::filesystem::create_directories(out_base_path);
-    std::ofstream outfile(filename);
-    outfile.close();
+    std::ofstream file(filename);
+    if (!file.is_open())
+        abort();
+    file.close();
 }
 
 static auto parse_source(const cxxopts::ParseResult& options)
@@ -132,8 +134,8 @@ static auto parse_source(const cxxopts::ParseResult& options)
 static auto run_generator(const cxxopts::ParseResult& options)
 {
     // Pre-create output file for handling #include of generated serde file while parsing source
-    const auto output_filename = options["output"].as<std::string>();
-    create_output_file(output_filename);
+    const auto& output_filename = options["output"].as<std::string>();
+    create_file(output_filename);
 
     // Parse source to AST
     auto [rv, src_ast] = parse_source(options);
