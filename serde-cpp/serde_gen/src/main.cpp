@@ -114,36 +114,33 @@ static auto touch_file(const std::string& filename)
     std::ofstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Failed to open output file: " << std::strerror(errno) << std::endl;
-        return 4;
+        return false;
     }
     file.close();
-    return 0;
+    return true;
 }
 
 static auto parse_source_to_ast(const cxxopts::ParseResult& options)
-    -> std::tuple<int, std::unique_ptr<cppast::cpp_file>>
+    -> std::unique_ptr<cppast::cpp_file>
 {
     const auto& source_filename = options["source"].as<std::string>();
     const auto fatal_errors = options.count("fatal_errors");
     auto clang_cfg = init_clang_compilation_config(options);
     auto logger = init_diagnostic_logger(options);
     auto src_ast = serde_gen::parse_file(clang_cfg, logger, source_filename, fatal_errors);
-    if (!src_ast)
-        return { 2, nullptr };
-    return { 0, std::move(src_ast) };
+    return src_ast;
 }
 
 static auto run_generator(const cxxopts::ParseResult& options)
 {
     // Pre-create output file for handling #include of generated serde file while parsing source
     const auto& output_filename = options["output"].as<std::string>();
-    int rc = touch_file(output_filename);
-    if (rc)
-        return rc;
+    if (!touch_file(output_filename))
+        return 3;
 
-    auto [rv, src_ast] = parse_source_to_ast(options);
-    if (rv)
-        return rv;
+    auto src_ast = parse_source_to_ast(options);
+    if (!src_ast)
+        return 2;
 
     if (options.count("verbose"))
         serde_gen::print_ast(std::cout, *src_ast);
