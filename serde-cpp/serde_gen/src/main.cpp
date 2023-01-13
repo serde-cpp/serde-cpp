@@ -75,15 +75,14 @@ static auto create_clang_compilation_config(const cxxopts::ParseResult& options)
 }
 
 static auto add_compilation_flags(const cxxopts::ParseResult& _options,
-                                  cppast::libclang_compile_config clang_cfg)
+                                  cppast::libclang_compile_config& clang_cfg)
 {
     cppast::compile_flags flags;
     clang_cfg.set_flags(cppast::cpp_standard::cpp_17, flags);
-    clang_cfg.fast_preprocessing(true);
 }
 
 static auto add_include_directories(const cxxopts::ParseResult& options,
-                                    cppast::libclang_compile_config clang_cfg)
+                                    cppast::libclang_compile_config& clang_cfg)
 {
     if (options.count("include_directory")) {
         for (auto& include : options["include_directory"].as<std::vector<std::string>>())
@@ -108,17 +107,20 @@ static auto init_diagnostic_logger(const cxxopts::ParseResult& options)
     return logger;
 }
 
-static auto create_file(const std::string& filename)
+static auto touch_file(const std::string& filename)
 {
     auto out_base_path = std::filesystem::path(filename).remove_filename();
     std::filesystem::create_directories(out_base_path);
     std::ofstream file(filename);
-    if (!file.is_open())
-        abort();
+    if (!file.is_open()) {
+        std::cerr << "Failed to open output file: " << std::strerror(errno) << std::endl;
+        return 4;
+    }
     file.close();
+    return 0;
 }
 
-static auto parse_source(const cxxopts::ParseResult& options)
+static auto parse_source_to_ast(const cxxopts::ParseResult& options)
     -> std::tuple<int, std::unique_ptr<cppast::cpp_file>>
 {
     const auto& source_filename = options["source"].as<std::string>();
@@ -135,18 +137,17 @@ static auto run_generator(const cxxopts::ParseResult& options)
 {
     // Pre-create output file for handling #include of generated serde file while parsing source
     const auto& output_filename = options["output"].as<std::string>();
-    create_file(output_filename);
+    int rc = touch_file(output_filename);
+    if (rc)
+        return rc;
 
-    // Parse source to AST
-    auto [rv, src_ast] = parse_source(options);
+    auto [rv, src_ast] = parse_source_to_ast(options);
     if (rv)
         return rv;
 
-    // Debug log AST
     if (options.count("verbose"))
         serde_gen::print_ast(std::cout, *src_ast);
 
-    // Generate serde header
     std::ofstream outfile(output_filename);
     serde_gen::generate_serde(outfile, *src_ast);
 

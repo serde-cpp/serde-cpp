@@ -6,7 +6,6 @@ include(CMakeParseArguments)
 # ARGS:
 #   SUFFIX default: "_serde.h"
 #   OUTPUT_DIRECTORY default: "${CMAKE_CURRENT_BINARY_DIR}/"
-# TODO: pass suffix to serde_gen
 #########################################################################################
 function(serde_generate_target TARGET)
 
@@ -60,7 +59,7 @@ function(serde_generate_target TARGET)
   # Export target's serde headers variable
   set("${TARGET}_SERDE_FILES" ${SERDE_HEADERS} PARENT_SCOPE)
 
-  # Get lenght of the list of files
+  # Get length of the list of files
   list(LENGTH SERDE_HEADERS LENGTH)
   math(EXPR MAX_IDX "${LENGTH} - 1")
 
@@ -75,6 +74,7 @@ function(serde_generate_target TARGET)
                 --output=${SERDE_HEADER}
                 --database_dir=${CMAKE_BINARY_DIR}
                 --database_file=compile_commands.json
+                --include_directory=${ARG_OUTPUT_DIRECTORY}
                 --verbose
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS serde_gen ${SOURCE})
@@ -85,8 +85,7 @@ function(serde_generate_target TARGET)
 
   # Final target with include dir exported
   add_library(${TARGET} INTERFACE IMPORTED)
-  target_include_directories(${TARGET} INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
+  target_include_directories(${TARGET} INTERFACE ${ARG_OUTPUT_DIRECTORY})
   add_dependencies(${TARGET} "${TARGET}_custom")
 
 endfunction(serde_generate_target)
-
