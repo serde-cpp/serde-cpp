@@ -15,18 +15,18 @@
 static auto create_option_list() -> cxxopts::Options
 {
     auto option_list = cxxopts::Options(
-        "serde_attr", "serde_attr - Serde attribute parser and serialization generator.\n");
+        "serde_gen", "serde_gen - serde-cpp serialization and deserialization generator.\n");
     // clang-format off
     option_list.add_options()
         ("h,help", "display this help and exit")
-        ("version", "display version information and exit")
+        ("V,version", "display version information and exit")
         ("v,verbose", "be verbose when parsing")
-        ("fatal_errors", "abort program when a parser error occurs, instead of doing error correction");
+        ("F,fatal_errors", "abort program when a parser error occurs, instead of doing error correction");
     option_list.add_options("compilation")
-        ("source", "the file that is being parsed", cxxopts::value<std::string>())
-        ("output", "the output file that will be generated", cxxopts::value<std::string>())
-        ("database_dir", "set the directory where a 'compile_commands.json' file is located containing build information", cxxopts::value<std::string>())
-        ("database_file", "set the file name whose configuration will be used regardless of the current file name", cxxopts::value<std::string>())
+        ("s,source", "the file that is being parsed", cxxopts::value<std::string>())
+        ("o,output", "the output file that will be generated", cxxopts::value<std::string>())
+        ("D,database_dir", "set the directory where a 'compile_commands.json' file is located containing build information", cxxopts::value<std::string>())
+        ("d,database_file", "set the file name whose configuration will be used regardless of the current file name", cxxopts::value<std::string>())
         ("I,include_directory", "add directory to include search path", cxxopts::value<std::vector<std::string>>());
     // clang-format on
     return option_list;
@@ -49,15 +49,16 @@ static auto handle_help_version(const cxxopts::Options& option_list,
 
 static auto validate_options(const cxxopts::ParseResult& options)
 {
+    int ret = 0;
     if (!options.count("source") || options["source"].as<std::string>().empty()) {
         std::cerr << "missing --source argument\n";
-        return 1;
+        ret = 1;
     }
     if (!options.count("output") || options["output"].as<std::string>().empty()) {
         std::cerr << "missing --output argument\n";
-        return 1;
+        ret = 1;
     }
-    return 0;
+    return ret;
 }
 
 static auto create_clang_compilation_config(const cxxopts::ParseResult& options)
@@ -156,7 +157,7 @@ static auto run_generator(const cxxopts::ParseResult& options)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[])
-{
+try {
     int ret = 0;
     auto option_list = create_option_list();
     const auto options = option_list.parse(argc, argv);
@@ -174,4 +175,8 @@ int main(int argc, char* argv[])
         return ret;
 
     return 0;
+}
+catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    return 1;
 }
