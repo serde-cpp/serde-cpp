@@ -39,7 +39,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE} (${PROJECT_NAME})")
 # Module ExternaProject for building projects in external trees.
 include(ExternalProject)
 # Include the external libraries in the path where cmake looks for find_package/library.
-set(PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}/external:${CMAKE_PREFIX_PATH}")
+list(PREPEND PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}/external")
 # `external` directory contains all dependency libraries for the sub-projects.
 add_subdirectory(external)
 
@@ -55,7 +55,7 @@ ExternalProject_Add(serde-cpp
     CMAKE_ARGS
         -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_PREFIX_PATH="${PREFIX_PATH}"
+        -DCMAKE_PREFIX_PATH=${PREFIX_PATH}
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
     DEPENDS
