@@ -37,14 +37,14 @@ static auto handle_help_version(const cxxopts::Options& option_list,
 {
     if (options.count("help")) {
         std::cout << option_list.help() << std::endl;
-        return 1;
+        return true;
     }
     if (options.count("version")) {
         std::cout << "serde_gen 0.1.0\n\n"
                   << "Using libclang version " << CPPAST_CLANG_VERSION_STRING << '\n';
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 static auto validate_options(const cxxopts::ParseResult& options)
@@ -132,7 +132,7 @@ static auto parse_source_to_ast(const cxxopts::ParseResult& options)
     return src_ast;
 }
 
-static auto run_generator(const cxxopts::ParseResult& options)
+static auto run_serde_generator(const cxxopts::ParseResult& options)
 {
     // Pre-create output file for handling #include of generated serde file while parsing source
     const auto& output_filename = options["output"].as<std::string>();
@@ -163,14 +163,14 @@ try {
     const auto options = option_list.parse(argc, argv);
 
     ret = handle_help_version(option_list, options);
-    if (ret == 1)
+    if (ret)
         return 0;
 
     ret = validate_options(options);
     if (ret)
         return ret;
 
-    ret = run_generator(options);
+    ret = run_serde_generator(options);
     if (ret)
         return ret;
 
