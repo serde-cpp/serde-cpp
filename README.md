@@ -119,6 +119,7 @@ Roadmap
 - [ ] CMake package
 - [ ] Support wchar\_t and other CharT
 - [ ] Serde-cpp project sample repo (using CMake's find\_package and add\_subdirectory)
+- [ ] Polymorphic objects and abstract classes (`[[serde::polymorphic]]`)
 
 
 #### License
