@@ -84,9 +84,12 @@ struct Namespace : public GenT<Namespace> {
 };
 
 struct LineBreak : public GenT<LineBreak> {
+    int count;
+    LineBreak(int count = 1) : count(count) {}
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
-        os << '\n';
+        for (int i = 0; i < count; i++)
+          os << '\n';
         return os;
     }
 };
@@ -177,10 +180,10 @@ struct GenVector : public std::vector<std::unique_ptr<Gen>>, public GenT<GenVect
 };
 
 class Generator {
+   public:
     std::ostream& os;
     IoCtl ctl;
 
-   public:
     Generator(std::ostream& os) : os(os) {}
 
     Generator& operator<<(const Gen& gen)

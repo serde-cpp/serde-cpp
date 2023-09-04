@@ -127,7 +127,7 @@ void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file)
             if (e.kind() == cppast::cpp_entity_kind::class_t && !info.is_old_entity()) {
                 auto& class_ = static_cast<const cppast::cpp_class&>(e);
 
-                outfile << "\n" << code_generator(e).str() << "\n";
+                outfile << "\n" << CodeGeneratorFromAst(e).str() << "\n";
 
                 outfile << R"(
 namespace serde {
