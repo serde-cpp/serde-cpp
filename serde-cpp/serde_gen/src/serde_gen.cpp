@@ -13,8 +13,99 @@
 
 namespace serde_gen {
 
+class Generator {
+    std::ostream& os;
+
+   public:
+    Generator(std::ostream& os) : os(os) {}
+
+    Generator& file_header()
+    {
+        os << R"(/*
+* Serde-cpp generated header file.
+* DO NOT EDIT!!
+*/)";
+        return *this;
+    }
+
+    Generator& line_break(size_t count = 1)
+    {
+        while (count--)
+            os << "\n";
+        return *this;
+    }
+
+    Generator& include_system(const char* header)
+    {
+        os << "#include <" << header << ">\n";
+        return *this;
+    }
+
+    Generator& include_local(const char* header)
+    {
+        os << "#include \"" << header << "\"\n";
+        return *this;
+    }
+
+    Generator& namespace_open(const char* ns)
+    {
+        os << "namespace " << ns << " {\n";
+        return *this;
+    }
+
+    Generator& namespace_close(const char* ns)
+    {
+        os << "}  // namespace " << ns << '\n';
+        return *this;
+    }
+
+    Generator& struct_serialize_begin(const char* name)
+    {
+        os << R"("
+// Serialize specialization
+template<typename T>
+struct Serialize<T, std::enable_if_t<std::is_same_v<T, )"
+           << name << R"(>>> { )";
+    }
+
+    Generator& struct_serialize_end(const char* name)
+    {
+        os << "};  // Serialize " << name << '\n';
+        return *this;
+    }
+
+    Generator& struct_static_serialize_fn()
+    {
+        os << R"(static void serialize(Serializer& ser, const T& val) )";
+        return *this;
+    }
+};
+
 void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file)
 {
+
+    auto gen = Generator(outfile);
+    gen.file_header()
+        .line_break()
+        .include_system("string")
+        .include_local("serde/serde.h")
+        .include_local("serde/std/string.h")
+        .line_break()
+        .namespace_open("serde")
+        .line_break()
+        .struct_serialize_begin("Options")
+        .struct_static_serialize_fn()
+        .block_begin()
+        .Serializer_serialize_struct_begin()
+        .Serializer_serialize_struct_field("debug", "debug")
+        .Serializer_serialize_struct_field("line", "line")
+        .Serializer_serialize_struct_field("func", "func")
+        .Serializer_serialize_struct_end()
+        .block_end()
+        .struct_serialize_end("Options")
+        .line_break()
+        .namespace_close("serde");
+
     outfile << R"(/*
 * Serde-cpp generated header file.
 * DO NOT EDIT!!
