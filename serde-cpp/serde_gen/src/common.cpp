@@ -63,7 +63,7 @@ void print_entity(std::ostream& out, const cppast::cpp_entity& e)
     }
     else {
         // print generated code
-        out << ": `" << code_generator(e).str() << '`' << '\n';
+        out << ": `" << CodeGeneratorFromAst(e).str() << '`' << '\n';
     }
 }
 
