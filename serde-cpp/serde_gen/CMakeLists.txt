@@ -13,7 +13,8 @@ add_executable(serde_gen
   src/main.cpp
   src/init.cpp
   src/common.cpp
-  src/serde_gen.cpp
+  #src/serde_gen.cpp
+  src/serde_gen2.cpp
 )
 target_link_libraries(serde_gen PRIVATE
   serde
