@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iomanip>
 
 #include <cppast/code_generator.hpp>
 #include <cppast/cpp_entity_kind.hpp>
@@ -7,175 +8,105 @@
 #include <cppast/cpp_namespace.hpp>
 #include <cppast/libclang_parser.hpp>
 #include <cppast/visitor.hpp>
+#include <cppast/cpp_class.hpp>
 
 #include "code_generator.h"
 #include "common.h"
+#include "gen.h"
+#include "filters.h"
 
 namespace serde_gen {
 
-class Generator {
-    std::ostream& os;
+static void generate_struct_serialize(gen::Generator& gen, const cppast::cpp_entity& e,
+                                      const cppast::visitor_info& info)
+{
+    using namespace gen;
 
-   public:
-    Generator(std::ostream& os) : os(os) {}
+    auto& class_ = static_cast<const cppast::cpp_class&>(e);
 
-    Generator& file_header()
-    {
-        os << R"(/*
-* Serde-cpp generated header file.
-* DO NOT EDIT!!
-*/)";
-        return *this;
+    gen << StructSerialize(std::string(e.name()));
+    gen << BlockBeginNL();
+    gen << StaticFunctionSerialize();
+    gen << BlockBeginNL();
+    gen << SERIALIZE_STRUCT_BEGIN;
+
+    // serialize member variables
+    for (auto& member : class_) {
+        if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
+            const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
+            gen.os << "ser.serialize_struct_field(\"" << member_var.name() << "\", val."
+                   << member_var.name() << ");\n";
+        }
     }
 
-    Generator& line_break(size_t count = 1)
-    {
-        while (count--)
-            os << "\n";
-        return *this;
+    gen << SERIALIZE_STRUCT_END;
+    gen << BlockEndNL();
+    gen << BlockEndSemiColonNL();
+    gen << LineBreak();
+}
+
+static void generate_struct_deserialize(gen::Generator& gen, const cppast::cpp_entity& e,
+                                        const cppast::visitor_info& info)
+{
+    using namespace gen;
+
+    auto& class_ = static_cast<const cppast::cpp_class&>(e);
+
+    gen << StructDeserialize(std::string(e.name()));
+    gen << BlockBeginNL();
+    gen << StaticFunctionDeserialize();
+    gen << BlockBeginNL();
+    gen << DESERIALIZE_STRUCT_BEGIN;
+
+    // deserialize member variables
+    for (auto& member : class_) {
+        if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
+            const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
+            gen.os << "de.deserialize_struct_field(\"" << member_var.name() << "\", val."
+                   << member_var.name() << ");\n";
+        }
     }
 
-    Generator& include_system(const char* header)
-    {
-        os << "#include <" << header << ">\n";
-        return *this;
-    }
+    gen << DESERIALIZE_STRUCT_END;
+    gen << BlockEndNL();
+    gen << BlockEndSemiColonNL();
+    gen << LineBreak();
+}
 
-    Generator& include_local(const char* header)
-    {
-        os << "#include \"" << header << "\"\n";
-        return *this;
-    }
+static void generate_serde_for_class(gen::Generator& gen, const cppast::cpp_entity& e,
+                                     const cppast::visitor_info& info)
+{
+    using namespace gen;
 
-    Generator& namespace_open(const char* ns)
-    {
-        os << "namespace " << ns << " {\n";
-        return *this;
-    }
+    gen << GenString(std::string(CodeGeneratorFromAst(e).str()));
+    gen << LineBreak(2);
+    gen << Namespace("serde") << BlockBeginNL();
+    gen << LineBreak();
 
-    Generator& namespace_close(const char* ns)
-    {
-        os << "}  // namespace " << ns << '\n';
-        return *this;
-    }
+    generate_struct_serialize(gen, e, info);
+    generate_struct_deserialize(gen, e, info);
 
-    Generator& struct_serialize_begin(const char* name)
-    {
-        os << R"("
-// Serialize specialization
-template<typename T>
-struct Serialize<T, std::enable_if_t<std::is_same_v<T, )"
-           << name << R"(>>> { )";
-    }
-
-    Generator& struct_serialize_end(const char* name)
-    {
-        os << "};  // Serialize " << name << '\n';
-        return *this;
-    }
-
-    Generator& struct_static_serialize_fn()
-    {
-        os << R"(static void serialize(Serializer& ser, const T& val) )";
-        return *this;
-    }
-};
+    gen << BlockEnd() << CommentInline("namespace serde\n");
+    gen << LineBreak();
+}
 
 void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file)
 {
+    using namespace gen;
 
     auto gen = Generator(outfile);
-    gen.file_header()
-        .line_break()
-        .include_system("string")
-        .include_local("serde/serde.h")
-        .include_local("serde/std/string.h")
-        .line_break()
-        .namespace_open("serde")
-        .line_break()
-        .struct_serialize_begin("Options")
-        .struct_static_serialize_fn()
-        .block_begin()
-        .Serializer_serialize_struct_begin()
-        .Serializer_serialize_struct_field("debug", "debug")
-        .Serializer_serialize_struct_field("line", "line")
-        .Serializer_serialize_struct_field("func", "func")
-        .Serializer_serialize_struct_end()
-        .block_end()
-        .struct_serialize_end("Options")
-        .line_break()
-        .namespace_close("serde");
+    gen << FileHeader();
+    gen << LineBreak();
+    gen << IncludeLocal("serde/serde.h");
+    gen << IncludeLocal("serde/std/string.h");
+    gen << LineBreak();
 
-    outfile << R"(/*
-* Serde-cpp generated header file.
-* DO NOT EDIT!!
-*/
-
-#include <string>
-#include <serde/serde.h>
-#include <serde/std/string.h>
-)";
-
-    cppast::visit(
-        file,
-        [](const cppast::cpp_entity& e) {
-            return (e.kind() == cppast::cpp_entity_kind::class_t && cppast::is_definition(e) &&
-                    cppast::has_attribute(e, "serde")) ||
-                   e.kind() == cppast::cpp_entity_kind::namespace_t;
-        },
-        [&](const cppast::cpp_entity& e, cppast::visitor_info info) {
-            if (e.kind() == cppast::cpp_entity_kind::class_t && !info.is_old_entity()) {
-                auto& class_ = static_cast<const cppast::cpp_class&>(e);
-
-                outfile << "\n" << CodeGeneratorFromAst(e).str() << "\n";
-
-                outfile << R"(
-namespace serde {
-// Serialize specialization
-template<typename T>
-struct Serialize<T, std::enable_if_t<std::is_same_v<T, )"
-                        << e.name() << R"(>>> {
-  static void serialize(Serializer& ser, const T& val) {
-    ser.serialize_struct_begin();
-)";
-                // serialize member variables
-                for (auto& member : class_) {
-                    if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
-                        const auto& member_var =
-                            static_cast<const cppast::cpp_member_variable&>(member);
-                        outfile << "      ser.serialize_struct_field(\"" << member_var.name()
-                                << "\", val." << member_var.name() << ");\n";
-                    }
-                }
-                outfile <<
-                    R"(    ser.serialize_struct_end();
-  }
-};
-// Deserialize specialization
-template<typename T>
-struct Deserialize<T, std::enable_if_t<std::is_same_v<T, )"
-                        << e.name() << R"(>>> {
-  static void deserialize(Deserializer& de, T& val) {
-    de.deserialize_struct_begin();
-)";
-                // deserialize member variables
-                for (auto& member : class_) {
-                    if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
-                        const auto& member_var =
-                            static_cast<const cppast::cpp_member_variable&>(member);
-                        outfile << "      de.deserialize_struct_field(\"" << member_var.name()
-                                << "\", val." << member_var.name() << ");\n";
-                    }
-                }
-                outfile <<
-                    R"(    de.deserialize_struct_end();
-  }
-};
-} // namespace serde
-
-)";
-            }
-        });
+    cppast::visit(file, filter_class_entities_with_serde_attr,
+                  [&](const cppast::cpp_entity& e, const cppast::visitor_info& info) {
+                      if (e.kind() == cppast::cpp_entity_kind::class_t && !info.is_old_entity()) {
+                          generate_serde_for_class(gen, e, info);
+                      }
+                  });
 }
 
 }  // namespace serde_gen

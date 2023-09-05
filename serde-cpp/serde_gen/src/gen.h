@@ -45,9 +45,9 @@ struct FileHeader : public GenT<FileHeader> {
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
         os << R"(/*
-* Serde-cpp generated header file.
-* DO NOT EDIT!!
-*/
+ * Serde-cpp generated header file.
+ * DO NOT EDIT!!
+ */
 )";
         return os;
     }
@@ -89,12 +89,21 @@ struct LineBreak : public GenT<LineBreak> {
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
         for (int i = 0; i < count; i++)
-          os << '\n';
+            os << '\n';
         return os;
     }
 };
 
 struct BlockBegin : public GenT<BlockBegin> {
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "{";
+        ctl.indent_inc();
+        return os;
+    }
+};
+
+struct BlockBeginNL : public GenT<BlockBeginNL> {
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
         os << "{\n";
@@ -106,17 +115,45 @@ struct BlockBegin : public GenT<BlockBegin> {
 struct BlockEnd : public GenT<BlockEnd> {
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
+        os << "}";
+        ctl.indent_dec();
+        return os;
+    }
+};
+
+struct BlockEndNL : public GenT<BlockEndNL> {
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
         os << "}\n";
         ctl.indent_dec();
         return os;
     }
 };
 
-struct BlockEndSemiColon : public GenT<BlockEnd> {
+struct BlockEndSemiColon : public GenT<BlockEndSemiColon> {
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "};";
+        ctl.indent_dec();
+        return os;
+    }
+};
+
+struct BlockEndSemiColonNL : public GenT<BlockEndSemiColonNL> {
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
         os << "};\n";
         ctl.indent_dec();
+        return os;
+    }
+};
+
+struct CommentInline : public GenT<CommentInline> {
+    std::string comment;
+    explicit CommentInline(std::string&& comment) : comment(std::move(comment)) {}
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << " // " << comment;
         return os;
     }
 };
@@ -132,10 +169,29 @@ struct StructSerialize : public GenT<StructSerialize> {
     }
 };
 
-struct SerializeFunction : public GenT<SerializeFunction> {
+struct StaticFunctionSerialize : public GenT<StaticFunctionSerialize> {
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
         os << "static void serialize(Serializer& ser, const T& val)";
+        return os;
+    }
+};
+
+struct StructDeserialize : public GenT<StructDeserialize> {
+    std::string name;
+    explicit StructDeserialize(std::string&& name) : name(std::move(name)) {}
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "template<typename T>\n";
+        os << "struct Deserialize<T, std::enable_if_t<std::is_same_v<T, " << name << ">>> ";
+        return os;
+    }
+};
+
+struct StaticFunctionDeserialize : public GenT<StaticFunctionDeserialize> {
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "static void deserialize(Deserializer& de, const T& val)";
         return os;
     }
 };
@@ -188,8 +244,8 @@ class Generator {
 
     Generator& operator<<(const Gen& gen)
     {
-        if (ctl.indent_lvl)
-          os << std::setw(ctl.indent_lvl);
+        //if (ctl.indent_lvl)
+            //os << std::setw(ctl.indent_lvl);
         gen.write(os, ctl);
         return *this;
     }
@@ -197,6 +253,9 @@ class Generator {
 
 inline const auto SERIALIZE_STRUCT_BEGIN = GenString("ser.serialize_struct_begin();\n");
 inline const auto SERIALIZE_STRUCT_END = GenString("ser.serialize_struct_end();\n");
+
+inline const auto DESERIALIZE_STRUCT_BEGIN = GenString("de.deserialize_struct_begin();\n");
+inline const auto DESERIALIZE_STRUCT_END = GenString("de.deserialize_struct_end();\n");
 
 }  // namespace gen
 }  // namespace serde_gen
