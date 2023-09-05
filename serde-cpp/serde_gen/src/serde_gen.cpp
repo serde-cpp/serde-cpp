@@ -26,9 +26,9 @@ static void generate_struct_serialize(gen::Generator& gen, const cppast::cpp_ent
 
     gen << StructSerialize(std::string(e.name()));
     gen << BlockBeginNL();
-    gen << StaticFunctionSerialize();
+    gen << StaticMethodSerialize();
     gen << BlockBeginNL();
-    gen << SERIALIZE_STRUCT_BEGIN;
+    gen << SerializeStructBegin();
 
     // serialize member variables
     for (auto& member : class_) {
@@ -39,7 +39,7 @@ static void generate_struct_serialize(gen::Generator& gen, const cppast::cpp_ent
         }
     }
 
-    gen << SERIALIZE_STRUCT_END;
+    gen << SerializeStructEnd();
     gen << BlockEndNL();
     gen << BlockEndSemiColonNL();
     gen << LineBreak();
@@ -54,9 +54,9 @@ static void generate_struct_deserialize(gen::Generator& gen, const cppast::cpp_e
 
     gen << StructDeserialize(std::string(e.name()));
     gen << BlockBeginNL();
-    gen << StaticFunctionDeserialize();
+    gen << StaticMethodDeserialize();
     gen << BlockBeginNL();
-    gen << DESERIALIZE_STRUCT_BEGIN;
+    gen << DeserializeStructBegin();
 
     // deserialize member variables
     for (auto& member : class_) {
@@ -67,7 +67,7 @@ static void generate_struct_deserialize(gen::Generator& gen, const cppast::cpp_e
         }
     }
 
-    gen << DESERIALIZE_STRUCT_END;
+    gen << DeserializeStructEnd();
     gen << BlockEndNL();
     gen << BlockEndSemiColonNL();
     gen << LineBreak();
