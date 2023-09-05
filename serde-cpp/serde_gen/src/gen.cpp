@@ -22,7 +22,7 @@ static void generate_struct_serialize(gen::Generator& gen, const cppast::cpp_ent
 {
     using namespace gen;
 
-    auto& class_ = static_cast<const cppast::cpp_class&>(e);
+    const auto& cpp_class = static_cast<const cppast::cpp_class&>(e);
 
     gen << StructSerialize(std::string(e.name()));
     gen << BlockBeginNL();
@@ -30,12 +30,10 @@ static void generate_struct_serialize(gen::Generator& gen, const cppast::cpp_ent
     gen << BlockBeginNL();
     gen << SerializeStructBegin();
 
-    // serialize member variables
-    for (auto& member : class_) {
+    for (const auto& member : cpp_class) {
         if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
             const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
-            gen.os << "ser.serialize_struct_field(\"" << member_var.name() << "\", val."
-                   << member_var.name() << ");\n";
+            gen << SerializeStructField(member_var.name(), member_var.name());
         }
     }
 
@@ -50,7 +48,7 @@ static void generate_struct_deserialize(gen::Generator& gen, const cppast::cpp_e
 {
     using namespace gen;
 
-    auto& class_ = static_cast<const cppast::cpp_class&>(e);
+    const auto& cpp_class = static_cast<const cppast::cpp_class&>(e);
 
     gen << StructDeserialize(std::string(e.name()));
     gen << BlockBeginNL();
@@ -58,12 +56,10 @@ static void generate_struct_deserialize(gen::Generator& gen, const cppast::cpp_e
     gen << BlockBeginNL();
     gen << DeserializeStructBegin();
 
-    // deserialize member variables
-    for (auto& member : class_) {
+    for (const auto& member : cpp_class) {
         if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
             const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
-            gen.os << "de.deserialize_struct_field(\"" << member_var.name() << "\", val."
-                   << member_var.name() << ");\n";
+            gen << DeserializeStructField(member_var.name(), member_var.name());
         }
     }
 
