@@ -180,6 +180,40 @@ struct StructDeserialize : public GenT<StructDeserialize> {
     }
 };
 
+struct SerializeStructField : public GenT<SerializeStructField> {
+    std::string key, value;
+    explicit SerializeStructField(const std::string& key, const std::string value)
+        : key(key), value(value)
+    {
+    }
+    explicit SerializeStructField(std::string&& key, std::string&& value)
+        : key(std::move(key)), value(std::move(value))
+    {
+    }
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "ser.serialize_struct_field(\"" << key << "\", val." << value << ");\n";
+        return os;
+    }
+};
+
+struct DeserializeStructField : public GenT<SerializeStructField> {
+    std::string key, value;
+    explicit DeserializeStructField(const std::string& key, const std::string value)
+        : key(key), value(value)
+    {
+    }
+    explicit DeserializeStructField(std::string&& key, std::string&& value)
+        : key(std::move(key)), value(std::move(value))
+    {
+    }
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "de.deserialize_struct_field(\"" << key << "\", val." << value << ");\n";
+        return os;
+    }
+};
+
 struct GenString : public GenT<GenString> {
     std::string string;
     explicit GenString(std::string&& string) : string(std::move(string)) {}
