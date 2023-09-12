@@ -55,12 +55,22 @@ struct FileHeader : public GenT<FileHeader> {
     }
 };
 
-struct Namespace : public GenT<Namespace> {
+struct NamespaceBegin : public GenT<NamespaceBegin> {
     std::string name;
-    explicit Namespace(std::string&& name) : name(std::move(name)) {}
+    explicit NamespaceBegin(std::string&& name) : name(std::move(name)) {}
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
-        os << "namespace " << name << ' ';
+        os << "namespace " << name << " {\n";
+        return os;
+    }
+};
+
+struct NamespaceEnd : public GenT<NamespaceEnd> {
+    std::string name;
+    explicit NamespaceEnd(std::string&& name) : name(std::move(name)) {}
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "}  // namespace " << name << '\n';
         return os;
     }
 };
@@ -323,7 +333,7 @@ class Generator {
     };
 
 SIMPLE_GEN_TYPE(StaticMethodDeserializeBegin,
-                "static void deserialize(Deserializer& de, const T& val) {\n");
+                "static void deserialize(Deserializer& de, T& val) {\n");
 SIMPLE_GEN_TYPE(StaticMethodSerializeBegin,
                 "static void serialize(Serializer& ser, const T& val) {\n");
 SIMPLE_GEN_TYPE(ApiSerializeStructBegin, "ser.serialize_struct_begin();\n");
