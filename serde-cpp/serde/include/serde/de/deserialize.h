@@ -18,7 +18,7 @@ void deserialize(Deserializer& de, T& val);
 template<typename T, typename = void>
 struct Deserialize;
 // {
-//   static void deserialize(Deserializer& de, const T& val);
+//   static void deserialize(Deserializer& de, T& val);
 // };
 
 

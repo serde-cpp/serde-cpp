@@ -57,15 +57,13 @@ void generate_serde_for_class(gen::Generator& gen, const cppast::cpp_entity& e,
     gen.add(GenString(std::move(entity_decl)));  // forward-declaration
                                                  // TODO: support namespaces
     gen.add(LineBreak(2));
-    gen.add(Namespace("serde"));
-    gen.add(BlockBeginNL());
+    gen.add(NamespaceBegin("serde"));
     gen.add(LineBreak());
 
     generate_struct_serialize(gen, e, info);
     generate_struct_deserialize(gen, e, info);
 
-    gen.add(BlockEnd());
-    gen.add(CommentInline("namespace serde\n"));
+    gen.add(NamespaceEnd("serde"));
     gen.add(LineBreak());
 }
 
