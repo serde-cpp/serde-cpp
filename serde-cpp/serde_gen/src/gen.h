@@ -3,7 +3,9 @@
 #include <fstream>
 #include <iomanip>
 #include <memory>
+#include <ostream>
 #include <vector>
+#include <algorithm>
 
 namespace serde_gen {
 namespace gen {
@@ -49,26 +51,6 @@ struct FileHeader : public GenT<FileHeader> {
  * DO NOT EDIT!!
  */
 )";
-        return os;
-    }
-};
-
-struct IncludeSystem : public GenT<IncludeSystem> {
-    std::string path;
-    explicit IncludeSystem(std::string&& path) : path(std::move(path)) {}
-    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
-    {
-        os << "#include <" << path << ">\n";
-        return os;
-    }
-};
-
-struct IncludeLocal : public GenT<IncludeLocal> {
-    std::string path;
-    explicit IncludeLocal(std::string&& path) : path(std::move(path)) {}
-    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
-    {
-        os << "#include \"" << path << "\"\n";
         return os;
     }
 };
@@ -215,7 +197,7 @@ struct ApiSerializeStructField : public GenT<ApiSerializeStructField> {
     }
 };
 
-struct ApiDeserializeStructField : public GenT<ApiSerializeStructField> {
+struct ApiDeserializeStructField : public GenT<ApiDeserializeStructField> {
     std::string key, value;
     explicit ApiDeserializeStructField(const std::string& key, const std::string value)
         : key(key), value(value)
@@ -273,18 +255,62 @@ struct GenVector : public std::vector<std::unique_ptr<Gen>>, public GenT<GenVect
 
 class Generator {
    public:
-    std::ostream& os;
-    IoCtl ctl;
+    Generator() = default;
 
-    Generator(std::ostream& os) : os(os) {}
-
-    Generator& operator<<(const Gen& gen)
+    Generator& add_header(std::unique_ptr<Gen>&& gen)
     {
-        // if (ctl.indent_lvl)
-        // os << std::setw(ctl.indent_lvl);
-        gen.write(os, ctl);
+        headers.emplace_back(std::move(gen));
         return *this;
     }
+
+    Generator& add_include_system(std::string&& header)
+    {
+        auto it = std::find(includes_system.begin(), includes_system.end(), header);
+        if (it == includes_system.end())
+            includes_system.emplace_back(std::move(header));
+        return *this;
+    }
+
+    Generator& add_include_local(std::string&& header)
+    {
+        auto it = std::find(includes_local.begin(), includes_local.end(), header);
+        if (it == includes_local.end())
+            includes_local.emplace_back(std::move(header));
+        return *this;
+    }
+
+    Generator& add(std::unique_ptr<Gen>&& gen)
+    {
+        gens.emplace_back(std::move(gen));
+        return *this;
+    }
+
+    void write(std::ostream& os)
+    {
+        IoCtl ctl;
+        for (const auto& header : headers) {
+            header->write(os, ctl);
+        }
+        LineBreak().write(os, ctl);
+        for (const auto& include : includes_system) {
+            os << "#include <" << include << ">\n";
+        }
+        LineBreak().write(os, ctl);
+        for (const auto& include : includes_local) {
+            os << "#include \"" << include << "\"\n";
+        }
+        LineBreak().write(os, ctl);
+        for (const auto& gen : gens) {
+            gen->write(os, ctl);
+        }
+        LineBreak().write(os, ctl);
+    }
+
+   private:
+    std::vector<std::unique_ptr<Gen>> headers;
+    std::vector<std::string> includes_system;
+    std::vector<std::string> includes_local;
+    std::vector<std::unique_ptr<Gen>> gens;
 };
 
 #define SIMPLE_GEN_TYPE(Type, data)                                      \

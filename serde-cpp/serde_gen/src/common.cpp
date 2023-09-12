@@ -10,7 +10,7 @@
 #include <cppast/libclang_parser.hpp>
 #include <cppast/visitor.hpp>
 
-#include "code_generator.h"
+#include "cppast_code_generator.h"
 
 namespace serde_gen {
 
@@ -63,7 +63,7 @@ void print_entity(std::ostream& out, const cppast::cpp_entity& e)
     }
     else {
         // print generated code
-        out << ": `" << CodeGeneratorFromAst(e).str() << '`' << '\n';
+        out << ": `" << CppastCodeGenerator(e).str() << '`' << '\n';
     }
 }
 
