@@ -8,13 +8,13 @@ namespace serde_gen {
 // it will only use a single line
 // derive from code_generator and implement various callbacks for printing
 // it will print into a std::string
-class CodeGeneratorFromAst : public cppast::code_generator {
+class CppastCodeGenerator : public cppast::code_generator {
     std::string str_;           // the result
     bool was_newline_ = false;  // whether or not the last token was a newline
                                 // needed for lazily printing them
 
    public:
-    CodeGeneratorFromAst(const cppast::cpp_entity& e)
+    CppastCodeGenerator(const cppast::cpp_entity& e)
     {
         // kickoff code generation here
         cppast::generate_code(*this, e);
@@ -29,7 +29,7 @@ class CodeGeneratorFromAst : public cppast::code_generator {
                                       cppast::cpp_access_specifier_kind) override
     {
         // generate declaration only
-        return CodeGeneratorFromAst::declaration;
+        return CppastCodeGenerator::declaration;
     }
 
     // no need to handle indentation, as only a single line is used

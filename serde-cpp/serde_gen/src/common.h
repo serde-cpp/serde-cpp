@@ -18,7 +18,4 @@ void print_entity(std::ostream& out, const cppast::cpp_entity& e);
 // prints the AST of a file
 void print_ast(std::ostream& out, const cppast::cpp_file& file);
 
-// generate serde header
-void generate_serde(std::ofstream& outfile, const cppast::cpp_file& file);
-
 }  // namespace serde_gen

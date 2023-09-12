@@ -8,6 +8,7 @@
 #include <cppast/libclang_parser.hpp>
 
 #include "common.h"
+#include "generate.h"
 
 namespace serde_gen::init {
 
@@ -140,7 +141,7 @@ auto run_serde_generator(const cxxopts::ParseResult &options) -> int {
         serde_gen::print_ast(std::cout, *src_ast);
 
     std::ofstream outfile(output_filename);
-    serde_gen::generate_serde(outfile, *src_ast);
+    serde_gen::generate_serde_for_file(outfile, *src_ast);
 
     return 0;
 }
