@@ -158,35 +158,53 @@ struct CommentInline : public GenT<CommentInline> {
     }
 };
 
-struct StructSerialize : public GenT<StructSerialize> {
+struct StructSerializeBegin : public GenT<StructSerializeBegin> {
     std::string name;
-    explicit StructSerialize(std::string&& name) : name(std::move(name)) {}
+    explicit StructSerializeBegin(std::string&& name) : name(std::move(name)) {}
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
         os << "template<typename T>\n";
-        os << "struct Serialize<T, std::enable_if_t<std::is_same_v<T, " << name << ">>> ";
+        os << "struct Serialize<T, std::enable_if_t<std::is_same_v<T, " << name << ">>> {\n";
         return os;
     }
 };
 
-struct StructDeserialize : public GenT<StructDeserialize> {
-    std::string name;
-    explicit StructDeserialize(std::string&& name) : name(std::move(name)) {}
+struct StructSerializeEnd : public GenT<StructSerializeEnd> {
     std::ostream& write(std::ostream& os, IoCtl& ctl) const override
     {
-        os << "template<typename T>\n";
-        os << "struct Deserialize<T, std::enable_if_t<std::is_same_v<T, " << name << ">>> ";
+        os << "};\n";
+        ctl.indent_dec();
         return os;
     }
 };
 
-struct SerializeStructField : public GenT<SerializeStructField> {
+struct StructDeserializeBegin : public GenT<StructDeserializeBegin> {
+    std::string name;
+    explicit StructDeserializeBegin(std::string&& name) : name(std::move(name)) {}
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "template<typename T>\n";
+        os << "struct Deserialize<T, std::enable_if_t<std::is_same_v<T, " << name << ">>> {\n";
+        return os;
+    }
+};
+
+struct StructDeserializeEnd : public GenT<StructDeserializeEnd> {
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "};\n";
+        ctl.indent_dec();
+        return os;
+    }
+};
+
+struct ApiSerializeStructField : public GenT<ApiSerializeStructField> {
     std::string key, value;
-    explicit SerializeStructField(const std::string& key, const std::string value)
+    explicit ApiSerializeStructField(const std::string& key, const std::string value)
         : key(key), value(value)
     {
     }
-    explicit SerializeStructField(std::string&& key, std::string&& value)
+    explicit ApiSerializeStructField(std::string&& key, std::string&& value)
         : key(std::move(key)), value(std::move(value))
     {
     }
@@ -197,13 +215,13 @@ struct SerializeStructField : public GenT<SerializeStructField> {
     }
 };
 
-struct DeserializeStructField : public GenT<SerializeStructField> {
+struct ApiDeserializeStructField : public GenT<ApiSerializeStructField> {
     std::string key, value;
-    explicit DeserializeStructField(const std::string& key, const std::string value)
+    explicit ApiDeserializeStructField(const std::string& key, const std::string value)
         : key(key), value(value)
     {
     }
-    explicit DeserializeStructField(std::string&& key, std::string&& value)
+    explicit ApiDeserializeStructField(std::string&& key, std::string&& value)
         : key(std::move(key)), value(std::move(value))
     {
     }
@@ -278,13 +296,32 @@ class Generator {
         }                                                                \
     };
 
-SIMPLE_GEN_TYPE(StaticMethodDeserialize,
-                "static void deserialize(Deserializer& de, const T& val) ");
-SIMPLE_GEN_TYPE(StaticMethodSerialize, "static void serialize(Serializer& se, const T& val) ");
-SIMPLE_GEN_TYPE(SerializeStructBegin, "ser.serialize_struct_begin();\n");
-SIMPLE_GEN_TYPE(SerializeStructEnd, "ser.serialize_struct_end();\n");
-SIMPLE_GEN_TYPE(DeserializeStructBegin, "de.deserialize_struct_end();\n");
-SIMPLE_GEN_TYPE(DeserializeStructEnd, "de.deserialize_struct_end();\n");
+SIMPLE_GEN_TYPE(StaticMethodDeserializeBegin,
+                "static void deserialize(Deserializer& de, const T& val) {\n");
+SIMPLE_GEN_TYPE(StaticMethodSerializeBegin,
+                "static void serialize(Serializer& ser, const T& val) {\n");
+SIMPLE_GEN_TYPE(ApiSerializeStructBegin, "ser.serialize_struct_begin();\n");
+SIMPLE_GEN_TYPE(ApiSerializeStructEnd, "ser.serialize_struct_end();\n");
+SIMPLE_GEN_TYPE(ApiDeserializeStructBegin, "de.deserialize_struct_end();\n");
+SIMPLE_GEN_TYPE(ApiDeserializeStructEnd, "de.deserialize_struct_end();\n");
+
+struct StaticMethodSerializeEnd : public GenT<StaticMethodSerializeEnd> {
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "}\n";
+        ctl.indent_dec();
+        return os;
+    }
+};
+
+struct StaticMethodDeserializeEnd : public GenT<StaticMethodDeserializeEnd> {
+    std::ostream& write(std::ostream& os, IoCtl& ctl) const override
+    {
+        os << "}\n";
+        ctl.indent_dec();
+        return os;
+    }
+};
 
 }  // namespace gen
 }  // namespace serde_gen
