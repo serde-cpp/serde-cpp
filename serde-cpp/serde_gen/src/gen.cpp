@@ -24,22 +24,20 @@ static void generate_struct_serialize(gen::Generator& gen, const cppast::cpp_ent
 
     const auto& cpp_class = static_cast<const cppast::cpp_class&>(e);
 
-    gen << StructSerialize(std::string(e.name()));
-    gen << BlockBeginNL();
-    gen << StaticMethodSerialize();
-    gen << BlockBeginNL();
-    gen << SerializeStructBegin();
+    gen << StructSerializeBegin(std::string(e.name()));
+    gen << StaticMethodSerializeBegin();
+    gen << ApiSerializeStructBegin();
 
     for (const auto& member : cpp_class) {
         if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
             const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
-            gen << SerializeStructField(member_var.name(), member_var.name());
+            gen << ApiSerializeStructField(member_var.name(), member_var.name());
         }
     }
 
-    gen << SerializeStructEnd();
-    gen << BlockEndNL();
-    gen << BlockEndSemiColonNL();
+    gen << ApiSerializeStructEnd();
+    gen << StaticMethodSerializeEnd();
+    gen << StructSerializeEnd();
     gen << LineBreak();
 }
 
@@ -50,22 +48,20 @@ static void generate_struct_deserialize(gen::Generator& gen, const cppast::cpp_e
 
     const auto& cpp_class = static_cast<const cppast::cpp_class&>(e);
 
-    gen << StructDeserialize(std::string(e.name()));
-    gen << BlockBeginNL();
-    gen << StaticMethodDeserialize();
-    gen << BlockBeginNL();
-    gen << DeserializeStructBegin();
+    gen << StructDeserializeBegin(std::string(e.name()));
+    gen << StaticMethodDeserializeBegin();
+    gen << ApiDeserializeStructBegin();
 
     for (const auto& member : cpp_class) {
         if (member.kind() == cppast::cpp_entity_kind::member_variable_t) {
             const auto& member_var = static_cast<const cppast::cpp_member_variable&>(member);
-            gen << DeserializeStructField(member_var.name(), member_var.name());
+            gen << ApiDeserializeStructField(member_var.name(), member_var.name());
         }
     }
 
-    gen << DeserializeStructEnd();
-    gen << BlockEndNL();
-    gen << BlockEndSemiColonNL();
+    gen << ApiDeserializeStructEnd();
+    gen << StaticMethodDeserializeEnd();
+    gen << StructDeserializeEnd();
     gen << LineBreak();
 }
 
