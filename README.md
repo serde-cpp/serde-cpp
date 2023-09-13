@@ -25,11 +25,11 @@ struct [[serde]] Point {
 int main() {
   Point point{ 10, 20 };
 
-  // serialization
+  // automatic serialization
   std::string serialized = serde_yaml::to_string(point).value();
   std::cout << serialized << std::endl;
 
-  // deserialization
+  // automatic deserialization
   Point deserialized = serde_yaml::from_str<Point>("x: 10\ny: 20\n").value();
   assert(point.x == deserialized.x && point.y == deserialized.y);
 }
@@ -76,8 +76,10 @@ For the [example](#example) above, the generated serialization/deserialization c
 // main_serde.h
 #include <serde/serde.h>
 
+namespace serde {
+
 template<>
-void serde::serialize(serde::Serializer& ser, const Point& point)
+void serialize(serde::Serializer& ser, const Point& point)
 {
   ser.serialize_struct_begin();
     ser.serialize_struct_field("x", point.x);
@@ -86,13 +88,15 @@ void serde::serialize(serde::Serializer& ser, const Point& point)
 }
 
 template<>
-void serde::deserialize(serde::Deserializer& de, Point& point)
+void deserialize(serde::Deserializer& de, Point& point)
 {
   de.deserialize_struct_begin();
     de.deserialize_struct_field("x", point.x);
     de.deserialize_struct_field("y", point.y);
   de.deserialize_struct_end();
 }
+
+}  // namespace serde
 ```
 
 Then the backend implementation of the Serializer/Deserializer will resolve the data layout.
