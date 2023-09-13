@@ -11,6 +11,19 @@ Serialization framework for C++17, inspired on Rust's [serde](https://serde.rs/)
 but rather with only valid C++17 syntax! That is, by using cpp's [[[_attributes_](https://en.cppreference.com/w/cpp/language/attributes)]],
 and provide a single API for serializing data types to any data format (yaml, json, toml, ...), like serde does for Rust.
 
+## Summary
+
+<details open>
+<summary><b>README</b></summary>
+
+* [Example](#example)
+* [How we do it?](#how-we-do-it)
+* [Overview](#overview)
+* [Project Structure](#project-structure)
+* [Roadmap](#roadmap)
+
+</details>
+
 Example
 ---
 
@@ -32,7 +45,7 @@ int main() {
 
 No macros, no duplicate description of the struct's fields, nothing else.. only [[serde]] attribute needed.
 
-How we do it
+How we do it?
 ---
 
 **serde-cpp** generates serialization code for each header or translation unit passed to the serde generator binary.
