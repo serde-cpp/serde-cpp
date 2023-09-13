@@ -5,17 +5,25 @@ serde-cpp
 > Currently in first stage of development !!
 > Open to contributions!
 
-Serialization framework for C++17, inspired on Rust's [serde](https://serde.rs/).
+Serialization framework for C++17, inspired by Rust [serde](https://serde.rs/) project.
 
-**serde-cpp** ultimate goal is to make C++ data structures _automatically_ serializable without using MACROS,
-but rather with only valid C++17 syntax! That is, by using cpp's [[[_attributes_](https://en.cppreference.com/w/cpp/language/attributes)]],
-and provide a single API for serializing data types to any data format (yaml, json, toml, ...), like serde does for Rust.
+
+## Features
+
+* **Automatic** serialization of C++ data structures (std's and user's)
+* Serialization support using valid C++17 syntax only
+* NO MACROS USED
+* Serde Cpp [[[**attributes**](https://en.cppreference.com/w/cpp/language/attributes)]]
+* **Single** serialization and deserialization APIs
+* Support for **multiple** output formats (yaml, json, toml, ...)
+
 
 ## Summary
 
 <details open>
 <summary><b>README</b></summary>
 
+* [Serde-cpp](#serde-cpp)
 * [Example](#example)
 * [How we do it?](#how-we-do-it)
 * [Overview](#overview)
