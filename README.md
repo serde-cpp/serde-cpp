@@ -13,6 +13,7 @@ No macros, no duplicate description of the struct's fields, nothing else..
 You only need `[[serde]]` attribute on the type you want serialize.
 
 ```cpp
+// main.cpp
 #include <serde/serde_yaml.h>
 #include "main_serde.h" // generated file with serialization code
 
@@ -72,6 +73,9 @@ using serde-cpp's Serializer and Deserializer APIs.
 For the [example](#example) above, the generated serialization/deserialization code would look like this:
 
 ```cpp
+// main_serde.h
+#include <serde/serde.h>
+
 template<>
 void serde::serialize(serde::Serializer& ser, const Point& point)
 {
@@ -91,8 +95,40 @@ void serde::deserialize(serde::Deserializer& de, Point& point)
 }
 ```
 
-More information will be provided here in the future.
+Then the backend implementation of the Serializer/Deserializer will resolve the data layout.
 
+For example, the YAML Serializer is already implemented and built into the project.
+So the output of this example using the YAML Serializer would be the following:
+
+```yaml
+# output.yml
+x: 10
+y: 20
+```
+
+In order to generate the serde file having serialization/deserialization code for your types,
+a CMake command is provided. Just pass the files you want to generate code for and it will output
+the serialization/deserialization code for them.
+
+```cmake
+# CMakeLists.txt
+include(serde-cpp) # serde cmake macros
+serde_generate_target(example_serde
+    # generate serialization/deserialization for the following listed files
+    main.cpp # a header "main_serde.h" will be generated
+)
+add_executable(example)
+target_sources(example PRIVATE
+    main.cpp
+)
+target_link_libraries(example PRIVATE
+  example_serde # get include path of generated file
+  serde_yaml
+  serde
+)
+```
+
+A template example project will be added and linked here.
 
 ## Overview
 
