@@ -68,8 +68,26 @@ Overview
 
 ![serde-diagram](extras/serde-diagram.png)
 
-Roadmap
+
 ---
+
+## Project Structure
+
+<details open>
+<summary><b>serde-cpp/serde-cpp</b></summary>
+
+* [external](./external) - External library dependencies
+* [extras](./extras) - Extra infrastructure files
+* [serde-cpp](./serde-cpp) - Project source code subdirectory
+    + [serde](./serde-cpp/serde) - Serde APIs only
+    + [serde\_gen](./serde-cpp/serde_gen) - Serde auto-generation binary project
+    + [serde\_yaml](./serde-cpp/serde_yaml) - YAML implementation of Serde APIs
+
+</details>
+
+---
+
+## Roadmap
 
 - [x] Serializer interface
 - [x] Deserializer interface
