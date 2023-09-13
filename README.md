@@ -24,11 +24,14 @@ Serialization framework for C++17, inspired by Rust [serde](https://serde.rs/) p
 <summary><b>README</b></summary>
 
 * [Serde-cpp](#serde-cpp)
+* [Features](#features)
+* [Summary](#summary)
 * [Example](#example)
 * [How we do it?](#how-we-do-it)
 * [Overview](#overview)
 * [Project Structure](#project-structure)
 * [Roadmap](#roadmap)
+* [License](#license)
 
 </details>
 
