@@ -38,23 +38,27 @@ Serialization framework for C++17, inspired by Rust [serde](https://serde.rs/) p
 Example
 ---
 
+No macros, no duplicate description of the struct's fields, nothing else..  
+You only need `[[serde]]` attribute on the type you want serialize.
+
 ```cpp
-struct [[serde]]
-Point {
+struct [[serde]] Point {
   int x;
   int y;
 };
 
 int main() {
   Point point{ 10, 20 };
+
+  // serialization
   std::string serialized = serde_yaml::to_string(point).value();
   std::cout << serialized << std::endl;
+
+  // deserialization
   Point deserialized = serde_yaml::from_str<Point>("x: 10\ny: 20\n").value();
   assert(point.x == deserialized.x && point.y == deserialized.y);
 }
 ```
-
-No macros, no duplicate description of the struct's fields, nothing else.. only [[serde]] attribute needed.
 
 How we do it?
 ---
