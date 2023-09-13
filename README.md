@@ -1,47 +1,21 @@
 serde-cpp
 ===
 
+Serialization framework for C++17, inspired by Rust [serde](https://serde.rs/) project.
+
 > Not ready yet !!
 > Currently in first stage of development !!
 > Open to contributions!
 
-Serialization framework for C++17, inspired by Rust [serde](https://serde.rs/) project.
-
-
-## Features
-
-* **Automatic** serialization of C++ data structures (std's and user's)
-* Serialization support using valid C++17 syntax only
-* NO MACROS USED
-* Serde Cpp [[[**attributes**](https://en.cppreference.com/w/cpp/language/attributes)]]
-* **Single** serialization and deserialization APIs
-* Support for **multiple** output formats (yaml, json, toml, ...)
-
-
-## Summary
-
-<details open>
-<summary><b>README</b></summary>
-
-* [Serde-cpp](#serde-cpp)
-* [Features](#features)
-* [Summary](#summary)
-* [Example](#example)
-* [How we do it?](#how-we-do-it)
-* [Overview](#overview)
-* [Project Structure](#project-structure)
-* [Roadmap](#roadmap)
-* [License](#license)
-
-</details>
-
-Example
----
+## Example
 
 No macros, no duplicate description of the struct's fields, nothing else..  
 You only need `[[serde]]` attribute on the type you want serialize.
 
 ```cpp
+#include <serde/serde_yaml.h>
+#include "main_serde.h" // generated file with serialization code
+
 struct [[serde]] Point {
   int x;
   int y;
@@ -60,14 +34,42 @@ int main() {
 }
 ```
 
-How we do it?
----
+
+## Summary
+
+<details open>
+<summary><b>README</b></summary>
+
+* [Serde-cpp](#serde-cpp)
+* [Example](#example)
+* [Summary](#summary)
+* [Features](#features)
+* [How we do it?](#how-we-do-it)
+* [Overview](#overview)
+* [Project Structure](#project-structure)
+* [Roadmap](#roadmap)
+* [License](#license)
+
+</details>
+
+
+## Features
+
+* **Automatic** serialization of C++ data structures (std's and user's)
+* Serialization support using valid C++17 syntax only
+* NO MACROS USED
+* Serde Cpp [[[**attributes**](https://en.cppreference.com/w/cpp/language/attributes)]]
+* **Single** serialization and deserialization APIs
+* Support for **multiple** output formats (yaml, json, toml, ...)
+
+
+## How we do it?
 
 **serde-cpp** generates serialization code for each header or translation unit passed to the serde generator binary.
-_serde_gen_ will scan the input file for types that have [[serde]] attributes applied and generate the serialization and deserialization code
+_serde_gen_ will scan the input file for types that have `[[serde]]` attributes applied to them and generate the serialization and deserialization code
 using serde-cpp's Serializer and Deserializer APIs.
 
-For the example above, the generated code would look like this:
+For the [example](#example) above, the generated serialization/deserialization code would look like this:
 
 ```cpp
 template<>
@@ -91,8 +93,8 @@ void serde::deserialize(serde::Deserializer& de, Point& point)
 
 More information will be provided here in the future.
 
-Overview
----
+
+## Overview
 
 ![serde-diagram](extras/serde-diagram.png)
 
