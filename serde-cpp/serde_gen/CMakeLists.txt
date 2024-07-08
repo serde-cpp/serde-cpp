@@ -15,12 +15,24 @@ add_executable(serde_gen
   src/common.cpp
   src/generate.cpp
 )
+add_executable(serde_cpp::serde_gen ALIAS serde_gen)
 target_link_libraries(serde_gen PRIVATE
   serde
   cppast
   cxxopts::cxxopts
 )
-install(TARGETS serde_gen)
+
+#########################################################################################
+# Installs
+#########################################################################################
+install(TARGETS serde_gen EXPORT serde_cppTargets)
+install(FILES cmake/serde_cpp.cmake DESTINATION lib/cmake/serde_cpp)
+
+#########################################################################################
+# Scripts
+#########################################################################################
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/serde_gen/cmake")
+include(serde_cpp)
 
 #########################################################################################
 # Tests

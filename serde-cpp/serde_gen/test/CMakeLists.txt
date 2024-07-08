@@ -2,10 +2,7 @@
 # Tests
 #########################################################################################
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/serde_gen/cmake")
-include(serde-cpp)
-
-serde_generate_target(test_serde_files
+serde_generate(test_serde_files
   mytypes.h
   test.cpp
 )

@@ -338,7 +338,7 @@ SIMPLE_GEN_TYPE(StaticMethodSerializeBegin,
                 "static void serialize(Serializer& ser, const T& val) {\n");
 SIMPLE_GEN_TYPE(ApiSerializeStructBegin, "ser.serialize_struct_begin();\n");
 SIMPLE_GEN_TYPE(ApiSerializeStructEnd, "ser.serialize_struct_end();\n");
-SIMPLE_GEN_TYPE(ApiDeserializeStructBegin, "de.deserialize_struct_end();\n");
+SIMPLE_GEN_TYPE(ApiDeserializeStructBegin, "de.deserialize_struct_begin();\n");
 SIMPLE_GEN_TYPE(ApiDeserializeStructEnd, "de.deserialize_struct_end();\n");
 
 struct StaticMethodSerializeEnd : public GenT<StaticMethodSerializeEnd> {

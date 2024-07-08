@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/serde_cppTargets.cmake")
+
+check_required_components(serde)
+check_required_components(serde_gen)
+check_required_components(serde_yaml)
+
+include("${CMAKE_CURRENT_LIST_DIR}/serde_cpp.cmake")

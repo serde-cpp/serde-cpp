@@ -2,16 +2,17 @@ include(CMakeParseArguments)
 
 #########################################################################################
 # Function to generate serde headers for source files.
-# serde_generate_target(<target> [SUFFIX <suffix>])
+# serde_generate(<target> [ARGS...] SOURCES)
 # ARGS:
 #   SUFFIX default: "_serde.h"
 #   OUTPUT_DIRECTORY default: "${CMAKE_CURRENT_BINARY_DIR}/"
+#   VERBOSE default: OFF
 #########################################################################################
-function(serde_generate_target TARGET)
+function(serde_generate TARGET)
 
   # Parse arguments
   set(prefix ARG)
-  set(flags)
+  set(flags VERBOSE)
   set(singleValues SUFFIX OUTPUT_DIRECTORY)
   set(multiValues)
   cmake_parse_arguments(PARSE_ARGV 1 "${prefix}" "${flags}" "${singleValues}" "${multiValues}")
@@ -30,6 +31,10 @@ function(serde_generate_target TARGET)
     set(ARG_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endif()
 
+  if(ARG_VERBOSE)
+    set(VERBOSE "--verbose")
+  endif()
+
   # Generate new list of serde header file names
   foreach(FILE IN LISTS ARG_SOURCES)
     # Get file absolute path
@@ -43,6 +48,11 @@ function(serde_generate_target TARGET)
     cmake_path(RELATIVE_PATH FILE_ABSPATH OUTPUT_VARIABLE FILE_REALPATH)
     # Check if file exists (throws error)
     file(READ "${FILE_ABSPATH}" FILE_READ)
+    # Get parent directory path
+    cmake_path(REMOVE_FILENAME FILE_REALPATH OUTPUT_VARIABLE REALBASE_PATH)
+    set(ABSBASE_PATH "${CMAKE_CURRENT_BINARY_DIR}/${REALBASE_PATH}")
+    # Create output directory
+    file(MAKE_DIRECTORY "${ABSBASE_PATH}")
 
     # Add "_serde.h" suffix to source file
     string(REGEX REPLACE "(.+)[.][^.]+$" "\\1${ARG_SUFFIX}" SERDE_HEADER ${FILE_REALPATH})
@@ -54,6 +64,7 @@ function(serde_generate_target TARGET)
     # Add file to control lists
     list(APPEND SERDE_HEADERS ${SERDE_HEADER})
     list(APPEND SOURCES ${FILE_ABSPATH})
+    list(APPEND INC_DIRS "${ABSBASE_PATH}")
   endforeach()
 
   # Export target's serde headers variable
@@ -69,15 +80,15 @@ function(serde_generate_target TARGET)
     list(GET SOURCES ${IDX} SOURCE)
     add_custom_command(
       OUTPUT ${SERDE_HEADER}
-      COMMAND $<TARGET_FILE:serde_gen>
+      COMMAND $<TARGET_FILE:serde_cpp::serde_gen>
                 --source=${SOURCE}
                 --output=${SERDE_HEADER}
                 --database_dir=${CMAKE_BINARY_DIR}
                 --database_file=compile_commands.json
                 --include_directory=${ARG_OUTPUT_DIRECTORY}
-                --verbose
+                ${VERBOSE}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-      DEPENDS serde_gen ${SOURCE})
+      DEPENDS serde_cpp::serde_gen ${SOURCE})
   endforeach()
 
   # Build dependency target
@@ -85,7 +96,7 @@ function(serde_generate_target TARGET)
 
   # Final target with include dir exported
   add_library(${TARGET} INTERFACE IMPORTED)
-  target_include_directories(${TARGET} INTERFACE ${ARG_OUTPUT_DIRECTORY})
+  target_include_directories(${TARGET} INTERFACE ${ARG_OUTPUT_DIRECTORY} ${INC_DIRS})
   add_dependencies(${TARGET} "${TARGET}_custom")
 
-endfunction(serde_generate_target)
+endfunction(serde_generate)

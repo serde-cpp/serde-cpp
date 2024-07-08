@@ -5,6 +5,7 @@
 find_package(GTest REQUIRED)
 # RapidYaml for parsing and emitting YAML
 find_package(ryml REQUIRED)
+find_package(c4core REQUIRED)
 
 #########################################################################################
 # serde_yaml
@@ -14,12 +15,22 @@ target_sources(serde_yaml PRIVATE
   src/serializer_yaml.cpp
   src/deserializer_yaml.cpp
 )
-target_include_directories(serde_yaml PUBLIC include)
+target_include_directories(serde_yaml PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 target_link_libraries(serde_yaml
   PUBLIC serde
-  PRIVATE ryml::ryml
+  PRIVATE
+  $<BUILD_INTERFACE:ryml::ryml>
+  #ryml::ryml
+  #c4core::c4core
 )
-install(TARGETS serde_yaml)
+add_custom_command(TARGET serde_yaml POST_BUILD
+    COMMAND libtool --tag=serde_yaml --mode=link cc -static -o $<TARGET_FILE:serde_yaml>
+    $<TARGET_FILE:serde_yaml> $<TARGET_FILE:ryml::ryml> $<TARGET_FILE:c4core::c4core>
+)
+install(TARGETS serde_yaml EXPORT serde_cppTargets)
 install(DIRECTORY include/serde_yaml DESTINATION include)
 
 #########################################################################################
@@ -38,7 +49,6 @@ target_include_directories(serde_yaml_test PRIVATE
 )
 target_link_libraries(serde_yaml_test PRIVATE
   serde_yaml
-  ryml::ryml
   GTest::gmock_main
   GTest::gmock
   GTest::gtest

@@ -192,7 +192,7 @@ A template example project will be added and linked here.
   - [ ] struct (POD type)
   - [ ] forward-declarations
   - [ ] foreign-types
-  - [ ] additional attributes (skip, skip\_de, skip\_ser, rename, getter, setter, flatten, skip\_none, default, ...)
+  - [ ] additional attributes (skip, skip\_de, skip\_ser, rename, getter, setter, flatten, skip\_none, default, untagged, ...)
 - [ ] Validate serde calls (seq/map utils) at interface level before impl (protected virtual)
 - [ ] Serde Union support
 - [ ] Support non-default constructable types
