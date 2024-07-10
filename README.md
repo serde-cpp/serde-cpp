@@ -1,39 +1,41 @@
 serde-cpp
 ===
 
-Serialization framework for C++17, inspired by Rust [serde](https://serde.rs/) project.
+Automatic serialization code generator for C++17.
 
-> Not ready yet !!
-> Currently in first stage of development !!
-> Open to contributions!
+> Project under development!
+> Looking for contributors.
 
 ## Example
 
-No macros, no duplicate description of the struct's fields, nothing else..  
-You only need `[[serde]]` attribute on the type you want serialize.
+Only need to add the `[[serde]]` attribute annotation to your **classes/structs/enums**.
 
 ```cpp
 // main.cpp
 #include <serde/serde_yaml.h>
-#include "main_serde.h" // generated file with serialization code
+#include "main_serde.h" // Generated file with serialization code
 
+// Note the serde attribute here
 struct [[serde]] Point {
   int x;
   int y;
 };
 
 int main() {
-  Point point{ 10, 20 };
+  Point p1{ 10, 20 };
 
-  // automatic serialization
-  std::string serialized = serde_yaml::to_string(point).value();
-  std::cout << serialized << std::endl;
+  // Serialize to YAML
+  std::string output = serde_yaml::to_string(p1).value();
+  std::cout << output << std::endl;
 
-  // automatic deserialization
-  Point deserialized = serde_yaml::from_str<Point>("x: 10\ny: 20\n").value();
-  assert(point.x == deserialized.x && point.y == deserialized.y);
+  // Deserialize from YAML
+  Point p2 = serde_yaml::from_str<Point>("x: 10\ny: 20\n").value();
+  assert(p1.x == p2.x && p1.y == p2.y);
 }
 ```
+
+No need for macros, no duplicate declaration of data members, no extra code!
+Isn't that beautiful?
 
 
 ## Summary
@@ -56,19 +58,18 @@ int main() {
 
 ## Features
 
-* **Automatic** serialization of C++ data structures (std's and user's)
-* Serialization support using valid C++17 syntax only
-* NO MACROS USED
-* Serde Cpp [[[**attributes**](https://en.cppreference.com/w/cpp/language/attributes)]]
-* **Single** serialization and deserialization APIs
-* Support for **multiple** output formats (yaml, json, toml, ...)
+* Automatic serialization of any data structure (std's and user's types);
+* C++17 syntax with `[[attributes]]`; See [cpp reference](https://en.cppreference.com/w/cpp/language/attributes)
+* Single serialization and deserialization APIs;
+* Multiple output formats (yaml, json, toml, ...);
+* No MACROS required.
 
 
 ## How we do it?
 
 **serde-cpp** generates serialization code for each header or translation unit passed to the serde generator binary.
-_serde_gen_ will scan the input file for types that have `[[serde]]` attributes applied to them and generate the serialization and deserialization code
-using serde-cpp's Serializer and Deserializer APIs.
+_serde_gen_ will scan the input file for types that have `[[serde]]` attributes added to them and generate the serialization and deserialization code
+using Serializer and Deserializer APIs.
 
 For the [example](#example) above, the generated serialization/deserialization code would look like this:
 
@@ -102,7 +103,7 @@ void deserialize(serde::Deserializer& de, Point& point)
 Then the backend implementation of the Serializer/Deserializer will resolve the data layout.
 
 For example, the YAML Serializer is already implemented and built into the project.
-So the output of this example using the YAML Serializer would be the following:
+So the output of this example using the YAML Serializer is the following:
 
 ```yaml
 # output.yml
@@ -111,13 +112,13 @@ y: 20
 ```
 
 In order to generate the serde file having serialization/deserialization code for your types,
-a CMake command is provided. Just pass the files you want to generate code for and it will output
+a CMake command is provided. Just add the files you want to generate code for and it will output
 the serialization/deserialization code for them.
 
 ```cmake
 # CMakeLists.txt
-include(serde-cpp) # serde cmake macros
-serde_generate_target(example_serde
+include(serde-cpp) # include serde cmake macros
+serde_generate(example_serde
     # generate serialization/deserialization for the following listed files
     main.cpp # a header "main_serde.h" will be generated
 )
@@ -126,13 +127,13 @@ target_sources(example PRIVATE
     main.cpp
 )
 target_link_libraries(example PRIVATE
-  example_serde # get include path of generated file
+  example_serde # to add include path of the generated file
   serde_yaml
   serde
 )
 ```
 
-A template example project will be added and linked here.
+See the [example project](https://github.com/serde-cpp/serde-cpp-example-package).
 
 ## Overview
 
